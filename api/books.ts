@@ -7,7 +7,7 @@ export async function FetchBooks() {
     const LIBRARY_ORIGIN = extras.LIBRARY_ORIGIN as string;
 
     try {
-        const res = await fetch(`${LIBRARY_API_URL}books/`, {
+        const res = await fetch(`${LIBRARY_API_URL}books/count`, {
             method: 'GET',
             headers: {
                 'Accept': 'application/json',

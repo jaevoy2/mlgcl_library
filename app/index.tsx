@@ -38,9 +38,8 @@ export default function Index() {
                 if(token) {
                     router.push('/dashboard')
                 }
-
                 setScreenLoading(false);
-            }, 500)
+            }, 600)
         }
 
         checkToken();
