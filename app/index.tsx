@@ -5,7 +5,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { LinearGradient } from 'expo-linear-gradient';
 import { router } from 'expo-router';
 import { useEffect, useRef, useState } from 'react';
-import { ActivityIndicator, Alert, Animated, Dimensions, Image, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import { ActivityIndicator, Alert, Animated, Dimensions, Image, Keyboard, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import { OtpInput } from 'react-native-otp-entry';
 
 const logo = require('../assets/images/logo-name.png');
@@ -238,7 +238,12 @@ export default function Index() {
                                 <Text style={{ fontSize: 18, fontWeight: 'bold' }}>Enter 6 Digits Code</Text>
                                 <Text style={{ fontSize: 13, marginTop: 25, color: '#545454' }}>Please enter verification code sent to your registered mlgcl email.</Text>
                                 <View style={{ marginTop: 20 }}>
-                                    <OtpInput numberOfDigits={6} focusColor={'#3498db'} autoFocus={false} onTextChange={setOtpCode} />
+                                    <OtpInput numberOfDigits={6} focusColor={'#3498db'} autoFocus={false} onTextChange={(text) => {
+                                        setOtpCode(text);
+                                        if(text.length == 6) {
+                                            Keyboard.dismiss();
+                                        }
+                                    }} />
                                 </View>
                                 <View style={{ flexDirection: 'row', alignSelf: 'center', marginTop: 10 }}>
                                     <Text style={{ fontSize: 12, color: '#545454' }}>Didn't receive a code? </Text>
@@ -253,14 +258,15 @@ export default function Index() {
                                 </View>
                             </View>
                             <View style={{ flex: 1, position: 'relative' }}>
-                                <TouchableOpacity onPress={() => handleOTPValidation()} disabled={otpSpinner} style={{ backgroundColor: otpSpinner == true ? '#5faee2ff' : '#3498db', width: width - 20, borderRadius: 30, paddingVertical: 12, position: 'absolute', bottom: 60, left: '50%', transform: [{ translateX: 50 }] }}>
+                                <TouchableOpacity onPress={() => handleOTPValidation()} disabled={otpSpinner} style={{ backgroundColor: otpSpinner == true ? '#5faee2ff' : '#3498db', width: width - 20,
+                                    borderRadius: 30, paddingVertical: 12, position: 'absolute', bottom: 60, left: '50%', transform: [{ translateX: '-50%' }] }}>
                                     {otpSpinner == true ? (
                                         <ActivityIndicator size={'small'} color={'#fff'} style={{ alignSelf: 'center' }} />
                                     ) : (
                                         <Text style={{ color: '#fff', fontWeight: 'bold', textAlign: 'center', fontSize: 16 }}>Verify</Text>
                                     )}
                                 </TouchableOpacity>
-                                <TouchableOpacity onPress={() => closeSheet()} style={{ position: 'absolute', bottom: 25, left: '50%', transform: [{ translateX: -50 }] }}>
+                                <TouchableOpacity onPress={() => closeSheet()} style={{ position: 'absolute', bottom: 25, left: '50%', transform: [{ translateX: '-50%' }] }}>
                                     <Text style={{ fontWeight: 'bold', textAlign: 'center', color: '#838383', fontSize: 16 }}>Cancel</Text>
                                 </TouchableOpacity>
                             </View>
