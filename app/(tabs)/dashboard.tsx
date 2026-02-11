@@ -1,0 +1,88 @@
+import { FetchBooks } from "@/api/books";
+import { Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
+import { LinearGradient } from "expo-linear-gradient";
+import { router } from "expo-router";
+import { useEffect, useState } from "react";
+import { ActivityIndicator, Alert, Dimensions, Text, TouchableOpacity, View } from "react-native";
+
+const { height, width } = Dimensions.get('window');
+
+
+export default function BooksView() {
+    const [loading, setLoading] = useState(false);
+    const [bookCount, setBookCount] = useState(0)
+    const [borrowedBooks, setBorrowedBooks] = useState(0)
+
+    useEffect(() => {
+        handleFetchBooks();
+    }, [])
+
+    const handleFetchBooks = async() => {
+        try {
+            const response = await FetchBooks();
+
+            if(!response.error) {
+                setBookCount(response.book_count);
+                setBorrowedBooks(response.book_borrowed);
+            }
+        }catch(error: any) {
+            Alert.alert('Error', error.message);
+        }finally {
+            setLoading(false);
+        }
+    }
+
+    return (
+        <View style={{ flex: 1, backgroundColor: '#fff', position: 'relative' }}>
+            {loading == true ? (
+                <View style={{ width, height, justifyContent: 'center', alignContent: 'center' }}>
+                    <ActivityIndicator color={'#3498db'} size={'large'} />
+                </View>
+            ) : (
+                <>
+                    <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', backgroundColor: '#3498db', height: 100, width, paddingTop: 40, paddingHorizontal: 20 }}>
+                        <Text style={{ fontWeight: '700', fontSize: 16, color: '#fff' }}>Boyet Dedal</Text>
+                        <Ionicons name={'person-circle-outline'} size={28} color={'#fff'} />
+                    </View>
+                    <View style={{ paddingTop: 30, paddingHorizontal: 20, gap: 20 }}>
+                        <View style={{ width: '100%', height: 100, padding: 20, borderRadius: 10, shadowColor: "#000", position: 'relative' }}>
+                            <LinearGradient
+                                colors={['#3498db', 'rgba(52, 152, 219, 0.88)',  'rgb(82, 179, 243)', 'rgba(241, 196, 15, 0.38)' ]}
+                                start={{ x: 0, y: 1 }}
+                                end={{ x: 1, y: 0 }}
+                                style={{ height: 100, position: 'absolute', width: width - 40 , bottom: 0, zIndex: -1, borderRadius: 10 }}
+                            />
+                            <Text style={{ color: '#fff' }}>Books</Text>
+                            <View style={{ marginTop: 5, flexDirection: 'row', alignItems: 'center', gap: 5 }}>
+                                <MaterialCommunityIcons name={'bookshelf'} size={35} color={'#fff'} />
+                                <Text style={{ fontWeight: '900', fontSize: 28, color: '#fff' }}>{bookCount}</Text>
+                            </View>
+                        </View>
+                        <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-end', width: '100%', height: 100, padding: 20, borderRadius: 10, shadowColor: "#000", position: 'relative' }}>
+                            <LinearGradient
+                                colors={['#3498db', 'rgba(52, 152, 219, 0.88)',  'rgb(82, 179, 243)', 'rgb(148, 205, 243)' ]}
+                                start={{ x: 0, y: 0 }}
+                                end={{ x: 1, y: 0 }}
+                                style={{ height: 100, position: 'absolute', width: width - 40 , bottom: 0, zIndex: -1, borderRadius: 10 }}
+                            />
+                            <View>
+                                <Text style={{ color: '#fff' }}>Borrowed Books</Text>
+                                <View style={{ marginTop: 5, flexDirection: 'row', alignItems: 'center', gap: 5 }}>
+                                    <MaterialCommunityIcons name={'bookshelf'} size={35} color={'#fff'} />
+                                    <Text style={{ fontWeight: '900', fontSize: 28, color: '#fff' }}>{borrowedBooks}</Text>
+                                </View>
+                            </View>
+                            <TouchableOpacity style={{ flexDirection: 'row', alignItems: 'center', gap: 3 }}>
+                                <Ionicons name={'open-outline'} size={20} color={'#fff'} />
+                                <Text style={{ color: '#fff', fontSize: 16 }}>View</Text>
+                            </TouchableOpacity>
+                        </View>
+                    </View>
+                    <TouchableOpacity onPress={() => router.push('/borrow')} style={{ padding: 20, backgroundColor: '#3498db', borderRadius: 50, position: 'absolute', right: 20, bottom: 50 }}>
+                        <MaterialCommunityIcons name={'qrcode-scan'} size={25} color={'#fff'} />
+                    </TouchableOpacity>
+                </>
+            )}
+        </View>
+    )
+}
