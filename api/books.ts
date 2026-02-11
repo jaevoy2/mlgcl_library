@@ -78,6 +78,8 @@ export async function getBookData(barcode: string) {
     });
 
     const data = await res.json(); 
+
+    console.log(data.acopies);
     
     return data;
   } catch (err) {
