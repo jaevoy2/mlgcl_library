@@ -1,5 +1,6 @@
 import { FetchBooks } from "@/api/books";
 import { Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import { LinearGradient } from "expo-linear-gradient";
 import { router } from "expo-router";
 import { useEffect, useState } from "react";
@@ -31,6 +32,11 @@ export default function BooksView() {
             setLoading(false);
         }
     }
+
+    const handleLogout = async () => {
+        await AsyncStorage.clear();
+        router.replace('/')
+    } 
 
     return (
         <View style={{ flex: 1, backgroundColor: '#fff', position: 'relative' }}>
@@ -80,6 +86,9 @@ export default function BooksView() {
                     </View>
                     <TouchableOpacity onPress={() => router.push('/borrow')} style={{ padding: 20, backgroundColor: '#3498db', borderRadius: 50, position: 'absolute', right: 20, bottom: 50 }}>
                         <MaterialCommunityIcons name={'qrcode-scan'} size={25} color={'#fff'} />
+                    </TouchableOpacity>
+                    <TouchableOpacity onPress={() => handleLogout()} style={{ padding: 20, backgroundColor: '#3498db', borderRadius: 50, position: 'absolute', right: 20, bottom: 10 }}>
+                        <Text>Logout</Text>
                     </TouchableOpacity>
                 </>
             )}

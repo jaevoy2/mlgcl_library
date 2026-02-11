@@ -35,6 +35,7 @@ yarn-error.*
 .env
 
 .history
+tsconfig.json
 
 # typescript
 *.tsbuildinfo
