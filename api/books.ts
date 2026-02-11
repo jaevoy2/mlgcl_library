@@ -65,7 +65,7 @@ export async function getBookData(barcode: string) {
     const LIBRARY_ORIGIN = extras.LIBRARY_ORIGIN as string;
   
   try {
-    const res = await fetch(`${LIBRARY_API_URL}borrow/scan`, {
+    const res = await fetch(`${LIBRARY_API_URL}borrow/scan-book`, {
       method: 'post',
       headers: {
         Accept:'application/json',

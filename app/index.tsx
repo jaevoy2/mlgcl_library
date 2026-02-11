@@ -308,6 +308,7 @@ const styles = StyleSheet.create({
         borderColor: '#f1f1f1'
     },
     passwordInput: {
+        paddingVertical: 10, 
         flexDirection: 'row',
         justifyContent: 'space-between',
         alignItems: 'center',
