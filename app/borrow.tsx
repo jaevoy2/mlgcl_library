@@ -1,7 +1,10 @@
 import { getBookData } from '@/api/books';
-import { Ionicons } from '@expo/vector-icons';
+import { ValidateUserQr } from '@/api/validateUserQr';
+import BorrowInfo from '@/components/borrowInfo';
+import { useBorrowBook } from '@/context/borrow';
+import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
 import { CameraView, useCameraPermissions } from 'expo-camera';
-import { LinearGradient } from 'expo-linear-gradient';
+import { router } from 'expo-router';
 import { useEffect, useRef, useState } from 'react';
 import {
   ActivityIndicator,
@@ -13,15 +16,15 @@ import {
   Text,
   TouchableOpacity,
   View,
-  useColorScheme
+  useColorScheme,
 } from 'react-native';
 
-const { width } = Dimensions.get('window');
+const { height, width } = Dimensions.get('window');
 
 // Simple theme configuration
 const getTheme = (isDark: boolean) => ({
-  background: isDark ? '#000' : '#fff',
-  text: isDark ? '#fff' : '#000',
+  background: isDark ? '#fff' : '#fff',
+  text: isDark ? '#000' : '#000',
   tint: isDark ? '#0a7ea4' : '#0a7ea4',
   icon: isDark ? '#9BA1A6' : '#687076',
   tabIconDefault: isDark ? '#9BA1A6' : '#687076',
@@ -32,6 +35,7 @@ export default function HomeScreen() {
   const isDark = colorScheme === 'dark';
   const theme = getTheme(isDark);
 
+  const { setBorrowedBook, updateBorrowedBook } = useBorrowBook();
   const [permission, requestPermission] = useCameraPermissions();
   const [isCameraActive, setIsCameraActive] = useState(false);
   const [scannedBook, setScannedBook] = useState<any>(null);
@@ -40,6 +44,7 @@ export default function HomeScreen() {
   const [isLoading, setIsLoading] = useState(false);
   const hasScanned = useRef(false);
   const [bookCopies, setBookCopies] = useState<any>(null);
+  const [isBorrowerScanned, setIsBorrowerScanned] = useState(false);
 
   // Auto-request camera permission on mount
   useEffect(() => {
@@ -64,14 +69,63 @@ export default function HomeScreen() {
 
     setIsCameraActive(false);
     setIsScanning(false);
-    setIsLoading(true);
+    
+    if(scannedBook != null) {
+      try {
+        const qrOrigin = 'https://portal.mlgcl.edu.ph';
+        const url =  new URL(data);
+        const origin = url.origin;
+        const pathname = url.pathname;
+        const lastpart =pathname.split('/').pop();
 
-    try {  
+        if(origin != qrOrigin) {
+          return Alert.alert('Invalid', 'Invalid QR code. Please scan a valid user QR code.', [{
+            text: 'OK',
+            onPress: () => { resetScanner() }
+          }]);
+        }
+
+        const response = await ValidateUserQr(lastpart);
+        if(!response.error) {
+          updateBorrowedBook('userId', response.id)
+          updateBorrowedBook('userName', response.full_name);
+          updateBorrowedBook('userImage', response.image);
+
+          setIsBorrowerScanned(true);
+        }
+        
+      }catch(error: any) {
+        Alert.alert('Error', error.message || 'Failed to validate user QR code.', [{
+          text: 'OK',
+          onPress: () => { resetScanner() }
+        }]);
+        
+      }finally{
+        setIsLoading(false);
+        resetScanner();
+        return;
+      }
+    }
+
+    
+    try {
+      setIsLoading(true);
       const bookData = await getBookData(data);
-      setScannedBook(bookData.book);
-      setBookCopies(bookData.acopies);
 
       if(bookData){
+        setScannedBook(bookData.book);
+        setBookCopies(bookData.acopies);
+        
+        setBorrowedBook({
+          bookCopyId: bookData.copy.id,
+          bookTitle: bookData.book.title,
+          bookSubtitle: bookData.book.bookSubtitle,
+          bookAuthor: bookData.book.authors.name,
+          bookPublished: bookData.book.publication_year,
+          availableCopies: bookData.acopies,
+          hasScannedBook: true
+        });
+
         setIsLoading(false);
         setShowBookModal(true);
       }
@@ -79,7 +133,6 @@ export default function HomeScreen() {
     } catch (error) {
       setIsLoading(false);
       Alert.alert('Error', 'Failed to fetch book data');
-      console.error('Scan error:', error);
       resetScanner();
     }
   };
@@ -90,6 +143,15 @@ export default function HomeScreen() {
       setIsScanning(true);
       setIsCameraActive(true);
     }, 2000);
+  };
+
+
+  const scanUserQr = () => {
+    setShowBookModal(false);
+
+    hasScanned.current = false;
+    setIsScanning(true);
+    setIsCameraActive(true);
   };
 
   const closeBookModal = () => {
@@ -116,9 +178,9 @@ export default function HomeScreen() {
           <View style={styles.cameraOverlay}>
             {/* Top bar with instruction */}
             <View style={styles.topBar}>
-              <Text style={styles.instructionText}>
-                Scan Book QR Code
-              </Text>
+              <TouchableOpacity onPress={() => {setBorrowedBook(null), setIsCameraActive(false), setIsScanning(false), router.back()}} style={{ position: 'absolute', top: 0, left: 20, padding: 8, borderRadius: 50, backgroundColor: '#fff' }}>
+                <Ionicons name={'arrow-back'} color={'#000'} size={25} />
+              </TouchableOpacity>
               {!isScanning && (
                 <Text style={[styles.instructionText, { marginTop: 10, fontSize: 14 }]}>
                   Processing...
@@ -165,12 +227,6 @@ export default function HomeScreen() {
         <View style={[styles.modalContainer, { backgroundColor: theme.background }]}>
           {/* Header */}
           <View style={styles.modalHeader}>
-            <LinearGradient
-              colors={['#3498db', 'rgba(52, 152, 219, 0.88)', 'rgb(82, 179, 243)']}
-              start={{ x: 0, y: 1 }}
-              end={{ x: 1, y: 0 }}
-              style={styles.headerGradient}
-            />
             <TouchableOpacity onPress={closeBookModal} style={styles.modalCloseButton}>
               <Ionicons name="close" size={28} color="#fff" />
             </TouchableOpacity>
@@ -187,56 +243,69 @@ export default function HomeScreen() {
             showsVerticalScrollIndicator={false}
           >
             {scannedBook && (
-              <>
-                <Text style={[styles.bookTitle, { color: theme.text }]}>
-                  {scannedBook.title}
-                </Text>
-                
-                {scannedBook.subtitle && (
-                  <Text style={[styles.bookSubtitle, { color: theme.text }]}>
-                    {scannedBook.subtitle}
+              <View style={{ height: height - 150, flexDirection: 'column', justifyContent: 'space-between' }}>
+                <View>
+                  <Text style={[styles.bookTitle, { color: theme.text }]}>
+                    {scannedBook.title}
                   </Text>
-                )}
-                
-                {scannedBook.description && (
-                  <View style={styles.descriptionContainer}>
-                    <Text style={[styles.sectionLabel, { color: theme.text }]}>
-                      Description
+                  
+                  {scannedBook.subtitle && (
+                    <Text style={[styles.bookSubtitle, { color: theme.text }]}>
+                      {scannedBook.subtitle}
                     </Text>
-                    <Text style={[styles.bookDescription, { color: theme.text }]}>
-                      {scannedBook.description}
-                    </Text>
+                  )}
+                  
+                  <View style={{ flexDirection: 'row', alignItems: 'flex-start', justifyContent: 'space-between' }}>
+                    <View>
+                      <View>
+                        <Text style={{ opacity: 0.7}}>
+                          Publication Year
+                        </Text>
+                        {scannedBook.publication_year && (
+                          <Text style={{fontSize: 16, marginTop: 3}}>
+                            {scannedBook.publication_year}
+                          </Text>
+                        )}
+                      </View>
+
+                      <View style={{ marginTop: 10, }}>
+                        <Text style={{ opacity: 0.7}}>
+                          Author
+                        </Text>
+                        {scannedBook.authors.length > 0 ? (
+                          scannedBook.authors.map((author: any) => (
+                            <Text key={author.id} style={{ fontSize: 16}}>{author.name}</Text>
+                          ))
+                        ) : (
+                          <Text>No authors found.</Text>
+                        )}
+                      </View>
+                    </View>
+
+                    <View>
+                      <Text style={{ opacity: 0.7}}>
+                        Available Copy
+                      </Text>
+                      {bookCopies && (
+                        <Text style={{fontSize: 16 }}>
+                          {bookCopies}
+                        </Text>
+                      )}
+                    </View>
                   </View>
-                )}
-                <Text style={{marginTop: 10, fontSize: 16, fontWeight: '600', opacity: 0.7}}>
-                  Publication Year
-                </Text>
-                {scannedBook.publication_year && (
-                  <Text style={{fontSize: 16, marginTop: 3}}>
-                    - {scannedBook.publication_year}
-                  </Text>
-                )}
-
-                <Text style={{marginTop: 10, fontSize: 16, fontWeight: '600', opacity: 0.7}}>
-                  Authors
-                </Text>
-                {scannedBook.authors.length > 0 ? (
-                  scannedBook.authors.map((author: any) => (
-                    <Text key={author.id} style={{marginTop:5, fontSize: 16}}>- {author.name}</Text>
-                  ))
-                ) : (
-                  <Text>No authors found.</Text>
-                )}
-
-                <Text style={{marginTop: 10, fontSize: 16, fontWeight: '600', opacity: 0.7}}>
-                  Available Copies
-                </Text>
-                {bookCopies && (
-                  <Text style={{fontSize: 16, marginTop: 3}}>
-                    - {bookCopies}
-                  </Text>
-                )}
+                  {scannedBook.description && (
+                    <View style={styles.descriptionContainer}>
+                      <Text style={[styles.sectionLabel, { color: theme.text }]}>
+                        Description
+                      </Text>
+                      <Text style={[styles.bookDescription, { color: theme.text }]}>
+                        {scannedBook.description}
+                      </Text>
+                    </View>
+                  )}
+                </ View>
                 <TouchableOpacity
+                  onPress={() => scanUserQr()}
                   style={{
                     backgroundColor: '#3498db',
                     padding: 12,
@@ -248,21 +317,25 @@ export default function HomeScreen() {
                     justifyContent: 'center',
                   }}
                 >
-                  <Ionicons
-                    name="book-outline"
+                  <MaterialCommunityIcons
+                    name={'qrcode-scan'}
                     size={22}
                     color="#fff"
                     style={{ marginRight: 8 }}
                   />
                   <Text style={{ color: '#fff', fontSize: 18 }}>
-                    Borrow Book
+                    Scan Borrower
                   </Text>
                 </TouchableOpacity>
-              </>
+              </View>
             )}
           </ScrollView>
         </View>
       </Modal>
+
+      {isBorrowerScanned == true && (
+        <BorrowInfo />
+      )}
     </View>
   );
 }
@@ -427,20 +500,8 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'space-between',
     paddingHorizontal: 20,
-    paddingTop: 60,
-    paddingBottom: 20,
-    borderBottomWidth: 1,
-    borderBottomColor: 'rgba(0,0,0,0.1)',
-    position: 'relative',
-    overflow: 'hidden',
-  },
-  headerGradient: {
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    right: 0,
-    bottom: 0,
-    zIndex: -1,
+    paddingVertical: 20,
+    backgroundColor: '#3498db',
   },
   modalHeaderTitle: {
     fontSize: 18,
@@ -453,31 +514,29 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   modalContentContainer: {
-    padding: 24,
+    padding: 20,
   },
   bookTitle: {
     fontSize: 28,
     fontWeight: 'bold',
-    marginBottom: 12,
+    marginBottom: 5,
     lineHeight: 34,
   },
   bookSubtitle: {
     fontSize: 18,
     opacity: 0.8,
-    marginBottom: 24,
+    marginBottom: 30,
     lineHeight: 24,
   },
   descriptionContainer: {
-    marginTop: 8,
+    marginTop: 30,
   },
   sectionLabel: {
-    fontSize: 16,
-    fontWeight: '600',
-    marginBottom: 12,
+    marginBottom: 10,
     opacity: 0.7,
   },
   bookDescription: {
-    fontSize: 16,
+    fontSize: 15,
     lineHeight: 24,
     opacity: 0.9,
   },

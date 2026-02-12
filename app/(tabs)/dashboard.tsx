@@ -62,8 +62,8 @@ export default function BooksView() {
                             />
                             <View>
                                 <Text style={{ color: '#fff' }}>Books</Text>
-                                <View style={{ marginTop: 5, flexDirection: 'row', alignItems: 'center', gap: 5 }}>
-                                    <MaterialCommunityIcons name={'bookshelf'} size={35} color={'#fff'} />
+                                <View style={{ marginTop: 5, flexDirection: 'row', alignItems: 'center', gap: 10 }}>
+                                    <MaterialCommunityIcons name={'book-open-page-variant'} size={30} color={'#fff'} />
                                     <Text style={{ fontWeight: '900', fontSize: 28, color: '#fff' }}>{bookCount}</Text>
                                 </View>
                             </View>
@@ -82,8 +82,8 @@ export default function BooksView() {
                             />
                             <View>
                                 <Text style={{ color: '#fff' }}>Borrowed Books</Text>
-                                <View style={{ marginTop: 5, flexDirection: 'row', alignItems: 'center', gap: 5 }}>
-                                    <MaterialCommunityIcons name={'bookshelf'} size={35} color={'#fff'} />
+                                <View style={{ marginTop: 5, flexDirection: 'row', alignItems: 'center', gap: 10 }}>
+                                    <MaterialCommunityIcons name={'book-open-page-variant'} size={30} color={'#fff'} />
                                     <Text style={{ fontWeight: '900', fontSize: 28, color: '#fff' }}>{borrowedBooks}</Text>
                                 </View>
                             </View>
@@ -96,7 +96,7 @@ export default function BooksView() {
                     <TouchableOpacity onPress={() => router.push('/borrow')} style={{ padding: 20, backgroundColor: '#3498db', borderRadius: 50, position: 'absolute', right: 20, bottom: 50 }}>
                         <MaterialCommunityIcons name={'qrcode-scan'} size={25} color={'#fff'} />
                     </TouchableOpacity>
-                    {/* <TouchableOpacity onPress={() => handleLogout()} style={{ padding: 20, backgroundColor: '#3498db', borderRadius: 50, position: 'absolute', right: 20, bottom: 10 }}>
+                    {/* <TouchableOpacity onPress={() => handleLogout()} style={{ padding: 20, backgroundColor: '#3498db', borderRadius: 50, position: 'absolute', right: 20, bottom: 50 }}>
                         <Text>Logout</Text>
                     </TouchableOpacity> */}
                 </>
