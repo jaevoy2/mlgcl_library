@@ -66,7 +66,7 @@ export default function BorrowingsView() {
                     <View style={{ paddingTop: 50 }}>
                         {borrowings.length == 0 && (
                             <View style={{ height: '100%', alignItems: 'center', paddingTop: 50 }}>
-                                <Text style={{ color: '#a8a8a8', fontSize: 16 }}>No borrowing record</Text>
+                                <Text style={{ color: '#a8a8a8', fontSize: 16 }}></Text>
                             </View>
                         )}
                     </View>

@@ -1,7 +1,7 @@
 import Constants from "expo-constants";
 
 export async function FetchBorrowings() {
-    const extras = Constants.expoConfig.extra ?? {};
+    const extras = Constants.expoConfig?.extra ?? {};
     const LIBRARY_API_URL = extras.LIBRARY_API_URL as string;
     const LIBRARY_API_KEY = extras.LIBRARY_API_KEY as string;
     const LIBRARY_ORIGIN = extras.LIBRARY_ORIGIN as string;
@@ -18,6 +18,7 @@ export async function FetchBorrowings() {
         });
 
         const response = await res.json();
+        console.log(response);
 
         if(!res.ok) {
             throw new Error(response.message);
