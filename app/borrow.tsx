@@ -45,6 +45,7 @@ export default function HomeScreen() {
   const hasScanned = useRef(false);
   const [bookCopies, setBookCopies] = useState<any>(null);
   const [isBorrowerScanned, setIsBorrowerScanned] = useState(false);
+  const [reserved, setReserved] = useState<any>(null);
 
   // Auto-request camera permission on mount
   useEffect(() => {
@@ -71,6 +72,7 @@ export default function HomeScreen() {
     setIsScanning(false);
     
     if(scannedBook != null) {
+      console.log('test');
       try {
         const qrOrigin = 'https://portal.mlgcl.edu.ph';
         const url =  new URL(data);
@@ -85,12 +87,11 @@ export default function HomeScreen() {
           }]);
         }
 
-        const response = await ValidateUserQr(lastpart);
+        const response = await ValidateUserQr(String(lastpart));
         if(!response.error) {
           updateBorrowedBook('userId', response.id)
           updateBorrowedBook('userName', response.full_name);
           updateBorrowedBook('userImage', response.image);
-
           setIsBorrowerScanned(true);
         }
         
@@ -115,6 +116,8 @@ export default function HomeScreen() {
       if(bookData){
         setScannedBook(bookData.book);
         setBookCopies(bookData.acopies);
+        console.log(bookData.reserved);
+        setReserved(bookData.reserved);
         
         setBorrowedBook({
           bookCopyId: bookData.copy.id,
@@ -283,14 +286,24 @@ export default function HomeScreen() {
                     </View>
 
                     <View>
-                      <Text style={{ opacity: 0.7}}>
-                        Available Copy
-                      </Text>
-                      {bookCopies && (
-                        <Text style={{fontSize: 16 }}>
-                          {bookCopies}
+                      <View>
+                        <Text style={{ opacity: 0.7}}>
+                          Available Copy
                         </Text>
-                      )}
+                        {bookCopies && (
+                          <Text style={{fontSize: 16 }}>
+                            {bookCopies}
+                          </Text>
+                        )}
+                      </View>
+                      <View style={{marginTop: 10}}>
+                        <Text style={{ opacity: 0.7}}>
+                          Reserved
+                        </Text>
+                        <Text style={{fontSize: 16 }}>
+                          {reserved ?? 0}
+                        </Text>
+                    </View>
                     </View>
                   </View>
                   {scannedBook.description && (

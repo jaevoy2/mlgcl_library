@@ -87,7 +87,7 @@ export default function BooksView() {
                                     <Text style={{ fontWeight: '900', fontSize: 28, color: '#fff' }}>{borrowedBooks}</Text>
                                 </View>
                             </View>
-                            <TouchableOpacity onPress={() => router.push('/borrowing')} style={{ flexDirection: 'row', alignItems: 'center', gap: 3 }}>
+                            <TouchableOpacity onPress={() => router.push('../borrowing')} style={{ flexDirection: 'row', alignItems: 'center', gap: 3 }}>
                                 <Ionicons name={'open-outline'} size={20} color={'#fff'} />
                                 <Text style={{ color: '#fff', fontSize: 16 }}>View</Text>
                             </TouchableOpacity>

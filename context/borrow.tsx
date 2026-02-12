@@ -20,7 +20,7 @@ type BorrowProps = {
 
 type BorrowContextType = {
     borrowedBook: BorrowProps | null;
-    setBorrowedBook: React.Dispatch<React.SetStateAction<BorrowProps>>;
+    setBorrowedBook: React.Dispatch<React.SetStateAction<BorrowProps | null>>;
     updateBorrowedBook: <K extends keyof BorrowProps> (
         key: K,
         value: BorrowProps[K]
