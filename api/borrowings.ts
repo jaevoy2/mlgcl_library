@@ -10,7 +10,7 @@ export async function FetchBorrowings() {
         const res = await fetch(`${LIBRARY_API_URL}borrowings/`, {
             method: 'GET',
             headers: {
-                'Accept': 'applcition/json',
+                'Accept': 'application/json',
                 'x-api-key': `${LIBRARY_API_KEY}`,
                 'Origin': `${LIBRARY_ORIGIN}`,
                 'Authorization': '2|qViPMAVbLC2WhnQWJ3EB6hPGVcQy4AK8t8PYL4uU2ea0a470'
@@ -18,7 +18,6 @@ export async function FetchBorrowings() {
         });
 
         const response = await res.json();
-        console.log(response);
 
         if(!res.ok) {
             throw new Error(response.message);
