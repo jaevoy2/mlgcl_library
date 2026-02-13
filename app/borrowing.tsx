@@ -184,7 +184,7 @@ export default function BorrowingsView() {
                 <View style={styles.modalOverlay}>
                     <View style={styles.modalContent}>
                         <View style={styles.modalHeader}>
-                            <Text style={styles.modalTitle}>Borrowing Details</Text>
+                            <Text style={styles.modalTitle}>Borrowed Book Details</Text>
                             <TouchableOpacity onPress={closeModal} style={styles.closeButton}>
                                 <Ionicons name="close" size={28} color="#2c3e50" />
                             </TouchableOpacity>
@@ -331,7 +331,7 @@ export default function BorrowingsView() {
                 <TouchableOpacity onPress={() => router.back()}>
                     <Ionicons name={'arrow-back'} color={'#fff'} size={25} />
                 </TouchableOpacity>
-                <Text style={{ color: '#fff', fontSize: 18, fontWeight: 'bold' }}>Borrowings</Text>
+                <Text style={{ color: '#fff', fontSize: 18, fontWeight: 'bold' }}>Currently Borrowed Books</Text>
                 <View style={{ width: 25 }} />
             </View>
             
