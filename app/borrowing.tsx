@@ -39,6 +39,7 @@ export default function BorrowingsView() {
                 }));
     
                 sestBorrowings(borrowingsData);
+                console.log(borrowingsData)
             }else {
                 Alert.alert('Error', response.message);
             }

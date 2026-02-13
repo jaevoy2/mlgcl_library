@@ -1,6 +1,5 @@
 import { getBookData } from '@/api/books';
 import { ValidateUserQr } from '@/api/validateUserQr';
-import BorrowInfo from '@/components/borrowInfo';
 import { useBorrowBook } from '@/context/borrow';
 import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
 import { CameraView, useCameraPermissions } from 'expo-camera';
@@ -44,7 +43,6 @@ export default function HomeScreen() {
   const [isLoading, setIsLoading] = useState(false);
   const hasScanned = useRef(false);
   const [bookCopies, setBookCopies] = useState<any>(null);
-  const [isBorrowerScanned, setIsBorrowerScanned] = useState(false);
 
   // Auto-request camera permission on mount
   useEffect(() => {
@@ -66,8 +64,6 @@ export default function HomeScreen() {
   const handleBarCodeScanned = async ({ type, data }: { type: string; data: string }) => {
     if (hasScanned.current) return;
     hasScanned.current = true;
-
-    setIsCameraActive(false);
     setIsScanning(false);
     
     if(scannedBook != null) {
@@ -86,12 +82,13 @@ export default function HomeScreen() {
         }
 
         const response = await ValidateUserQr(lastpart);
+        console.log(response)
         if(!response.error) {
-          updateBorrowedBook('userId', response.id)
-          updateBorrowedBook('userName', response.full_name);
-          updateBorrowedBook('userImage', response.image);
+          updateBorrowedBook('userId', response.data.id)
+          updateBorrowedBook('userName', response.data.full_name);
+          updateBorrowedBook('userImage', response.data.image);
 
-          setIsBorrowerScanned(true);
+          router.push('/borrowInfo')
         }
         
       }catch(error: any) {
@@ -109,19 +106,22 @@ export default function HomeScreen() {
 
     
     try {
+      setIsCameraActive(false);
       setIsLoading(true);
       const bookData = await getBookData(data);
 
       if(bookData){
         setScannedBook(bookData.book);
         setBookCopies(bookData.acopies);
-        
+        console.log(bookData.book.authors)
         setBorrowedBook({
           bookCopyId: bookData.copy.id,
           bookTitle: bookData.book.title,
-          bookSubtitle: bookData.book.bookSubtitle,
-          bookAuthor: bookData.book.authors.name,
+          bookSubtitle: bookData.book.subtitle,
+          bookAuthor: bookData.book.authors[0].name,
           bookPublished: bookData.book.publication_year,
+          bookClassification: bookData.book.classification.description,
+          bookLanguage: bookData.book.language.name,
           availableCopies: bookData.acopies,
           hasScannedBook: true
         });
@@ -209,7 +209,7 @@ export default function HomeScreen() {
 
       {/* Loading Screen */}
       {isLoading && (
-        <View style={[styles.loadingContainer, { backgroundColor: theme.background }]}>
+        <View style={[styles.loadingContainer, { backgroundColor: 'rgba(255,255,255,0.8)' }]}>
           <ActivityIndicator size="large" color={theme.tint} />
           <Text style={[styles.loadingText, { color: theme.text }]}>
             Loading book details...
@@ -333,9 +333,6 @@ export default function HomeScreen() {
         </View>
       </Modal>
 
-      {isBorrowerScanned == true && (
-        <BorrowInfo />
-      )}
     </View>
   );
 }
