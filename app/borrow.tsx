@@ -1,6 +1,5 @@
 import { getBookData } from '@/api/books';
 import { ValidateUserQr } from '@/api/validateUserQr';
-import BorrowInfo from '@/components/borrowInfo';
 import { useBorrowBook } from '@/context/borrow';
 import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
 import { CameraView, useCameraPermissions } from 'expo-camera';
@@ -67,8 +66,6 @@ export default function HomeScreen() {
   const handleBarCodeScanned = async ({ type, data }: { type: string; data: string }) => {
     if (hasScanned.current) return;
     hasScanned.current = true;
-
-    setIsCameraActive(false);
     setIsScanning(false);
     
     if(scannedBook != null) {
@@ -110,6 +107,7 @@ export default function HomeScreen() {
 
     
     try {
+      setIsCameraActive(false);
       setIsLoading(true);
       const bookData = await getBookData(data);
 
@@ -122,9 +120,11 @@ export default function HomeScreen() {
         setBorrowedBook({
           bookCopyId: bookData.copy.id,
           bookTitle: bookData.book.title,
-          bookSubtitle: bookData.book.bookSubtitle,
-          bookAuthor: bookData.book.authors.name,
+          bookSubtitle: bookData.book.subtitle,
+          bookAuthor: bookData.book.authors[0].name,
           bookPublished: bookData.book.publication_year,
+          bookClassification: bookData.book.classification.description,
+          bookLanguage: bookData.book.language.name,
           availableCopies: bookData.acopies,
           hasScannedBook: true
         });
@@ -212,7 +212,7 @@ export default function HomeScreen() {
 
       {/* Loading Screen */}
       {isLoading && (
-        <View style={[styles.loadingContainer, { backgroundColor: theme.background }]}>
+        <View style={[styles.loadingContainer, { backgroundColor: 'rgba(255,255,255,0.8)' }]}>
           <ActivityIndicator size="large" color={theme.tint} />
           <Text style={[styles.loadingText, { color: theme.text }]}>
             Loading book details...
@@ -346,9 +346,6 @@ export default function HomeScreen() {
         </View>
       </Modal>
 
-      {isBorrowerScanned == true && (
-        <BorrowInfo />
-      )}
     </View>
   );
 }

@@ -29,7 +29,7 @@ export default function BooksView() {
                 setBorrowedBooks(response.borrowed_count);
             }
         }catch(error: any) {
-            Alert.alert('Error', error.message);
+            Alert.alert('Error', error.message || 'Failed to load data. Please check your internet connection');
         }finally {
             setLoading(false);
         }
@@ -50,7 +50,12 @@ export default function BooksView() {
                 <>
                     <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', backgroundColor: '#3498db', height: 100, width, paddingTop: 40, paddingHorizontal: 20 }}>
                         <Text style={{ fontWeight: '700', fontSize: 16, color: '#fff' }}>Boyet Dedal</Text>
-                        <Ionicons name={'person-circle-outline'} size={28} color={'#fff'} />
+                        <View style={{ flexDirection: 'row', gap: 20 }}>
+                            <TouchableOpacity onPress={() => router.push('/search')}>
+                                <Ionicons name={'search'} color={'#fff'} size={25} />
+                            </TouchableOpacity>
+                            <Ionicons name={'person-circle-outline'} size={28} color={'#fff'} />
+                        </View>
                     </View>
                     <View style={{ paddingTop: 30, paddingHorizontal: 20, gap: 20 }}>
                         <View style={{ flexDirection: 'row', alignItems: 'flex-start', justifyContent: 'space-between', width: '100%', height: 100, padding: 20, borderRadius: 10, shadowColor: "#000", position: 'relative' }}>

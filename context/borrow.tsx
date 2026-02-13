@@ -1,13 +1,15 @@
 import React, { createContext, useContext, useState } from "react";
 
 
-type BorrowProps = {
-    bookCopyId: number;
-    bookAuthor: string;
-    bookTitle: string;
-    bookSubtitle: string;
-    bookPublished: string;
-    availableCopies: number;
+export type BorrowProps = {
+    bookCopyId?: number;
+    bookAuthor?: string;
+    bookTitle?: string;
+    bookSubtitle?: string;
+    bookPublished?: string;
+    bookClassification?: string;
+    bookLanguage?: string;
+    availableCopies?: number;
     borrowDate?: string;
     returnDate?: string;
     userId?: number;
@@ -15,7 +17,7 @@ type BorrowProps = {
     userCourse?: string;
     userYearLevel?: string;
     userImage?: string;
-    hasScannedBook: boolean; 
+    hasScannedBook?: boolean;
 }
 
 type BorrowContextType = {

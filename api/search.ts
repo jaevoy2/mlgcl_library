@@ -1,22 +1,25 @@
 import Constants from "expo-constants";
 
-export async function FetchBorrowings() {
-    const extras = Constants.expoConfig?.extra ?? {};
+
+export async function SearchBook(param: string) {
+    const extras = Constants.expoConfig.extra ?? {};
     const LIBRARY_API_URL = extras.LIBRARY_API_URL as string;
     const LIBRARY_API_KEY = extras.LIBRARY_API_KEY as string;
-    const LIBRARY_ORIGIN = extras.LIBRARY_API_ORIGIN as string;
+    const LIBRARY_ORIGIN = extras.LIBRARY_ORIGIN as string;
 
     try {
-        const res = await fetch(`${LIBRARY_API_URL}borrowings/`, {
-            method: 'GET',
+        const res = await fetch(`${LIBRARY_API_URL}books/search-books`, {
+            method: 'POST',
             headers: {
                 'Accept': 'application/json',
+                'Content-Type': 'application/json',
                 'x-api-key': `${LIBRARY_API_KEY}`,
                 'Origin': `${LIBRARY_ORIGIN}`,
-                'Authorization': '2|qViPMAVbLC2WhnQWJ3EB6hPGVcQy4AK8t8PYL4uU2ea0a470'
-            }
+                'Authorization': 'I5MulGCY8dmFEr6xUB2oKtiLiLzEDf8goYBdTmy9RuPt6K0p70Zrb7txhl3bE6Jz'
+            },
+            body: JSON.stringify({ search: param })
         });
-
+    
         const response = await res.json();
 
         if(!res.ok) {

@@ -152,7 +152,7 @@ export default function Index() {
                 await AsyncStorage.setItem('access_token', response.access_token);
                 console.log(response.access_token)
 
-                router.push('/(tabs)/dashboard')
+                router.replace('/(tabs)/dashboard')
             }
         }catch(error: any) {
             Alert.alert('Error', error.message);
