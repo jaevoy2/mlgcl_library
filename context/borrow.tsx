@@ -10,6 +10,7 @@ export type BorrowProps = {
     bookClassification?: string;
     bookLanguage?: string;
     availableCopies?: number;
+    reserved?: number;
     borrowDate?: string;
     returnDate?: string;
     userId?: number;
@@ -17,6 +18,7 @@ export type BorrowProps = {
     userCourse?: string;
     userYearLevel?: string;
     userImage?: string;
+    userType?: string;
     hasScannedBook?: boolean;
 }
 

@@ -86,10 +86,13 @@ export default function HomeScreen() {
 
         const response = await ValidateUserQr(String(lastpart));
         if(!response.error) {
-          updateBorrowedBook('userId', response.id)
-          updateBorrowedBook('userName', response.full_name);
-          updateBorrowedBook('userImage', response.image);
-          setIsBorrowerScanned(true);
+          console.log(response)
+          updateBorrowedBook('userId', response.data.user.id)
+          updateBorrowedBook('userName', response.data.full_name);
+          updateBorrowedBook('userImage', response.data.image);
+          updateBorrowedBook('userType', response.data.user.type)
+          
+          router.push('/borrowInfo')
         }
         
       }catch(error: any) {
@@ -114,18 +117,19 @@ export default function HomeScreen() {
       if(bookData){
         setScannedBook(bookData.book);
         setBookCopies(bookData.acopies);
-        console.log(bookData.reserved);
+
         setReserved(bookData.reserved);
         
         setBorrowedBook({
           bookCopyId: bookData.copy.id,
-          bookTitle: bookData.book.title,
+          bookTitle: bookData.book?.title,
           bookSubtitle: bookData.book.subtitle,
           bookAuthor: bookData.book.authors[0].name,
           bookPublished: bookData.book.publication_year,
           bookClassification: bookData.book.classification.description,
           bookLanguage: bookData.book.language.name,
           availableCopies: bookData.acopies,
+          reserved: bookData.reserved,
           hasScannedBook: true
         });
 
@@ -249,7 +253,7 @@ export default function HomeScreen() {
               <View style={{ height: height - 150, flexDirection: 'column', justifyContent: 'space-between' }}>
                 <View>
                   <Text style={[styles.bookTitle, { color: theme.text }]}>
-                    {scannedBook.title}
+                    {scannedBook?.title}
                   </Text>
                   
                   {scannedBook.subtitle && (

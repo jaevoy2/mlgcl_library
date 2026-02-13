@@ -20,7 +20,8 @@ export async function ConfirmBorrow(borrowData: BorrowProps) {
             },
             body: JSON.stringify({ 
                 book_copy_id: borrowData.bookCopyId,
-                user_id: borrowData.userId
+                user_id: borrowData.userId,
+                borrower_type: borrowData.userType
             })
         });
 
