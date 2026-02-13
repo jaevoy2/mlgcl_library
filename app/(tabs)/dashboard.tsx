@@ -7,6 +7,7 @@ import { useEffect, useState } from "react";
 import { ActivityIndicator, Alert, Dimensions, Text, TouchableOpacity, View } from "react-native";
 
 const { height, width } = Dimensions.get('window');
+const logo = require('@/assets/images/logo.png')
 
 
 export default function BooksView() {
@@ -54,7 +55,7 @@ export default function BooksView() {
                             <TouchableOpacity onPress={() => router.push('/search')}>
                                 <Ionicons name={'search'} color={'#fff'} size={25} />
                             </TouchableOpacity>
-                            <Ionicons name={'person-circle-outline'} size={28} color={'#fff'} />
+                            {/* <Ionicons name={'person-circle-outline'} size={28} color={'#fff'} /> */}
                         </View>
                     </View>
                     <View style={{ paddingTop: 30, paddingHorizontal: 20, gap: 20 }}>

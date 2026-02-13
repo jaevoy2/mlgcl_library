@@ -150,7 +150,6 @@ export default function Index() {
             if(!response.error) {
                 await AsyncStorage.setItem('device_token', response.device_token);
                 await AsyncStorage.setItem('access_token', response.access_token);
-                console.log(response.access_token)
 
                 router.replace('/(tabs)/dashboard')
             }

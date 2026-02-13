@@ -107,9 +107,7 @@ export default function ReservationView() {
           paddingTop: 48,
           paddingBottom: 20,
           paddingHorizontal: 20,
-          backgroundColor: "#2563eb",
-          borderBottomLeftRadius: 24,
-          borderBottomRightRadius: 24,
+          backgroundColor: "#3498db",
           shadowColor: "#000",
           shadowOpacity: 0.1,
           shadowRadius: 6,
@@ -117,12 +115,12 @@ export default function ReservationView() {
         }}
       >
         <Text style={{ color: "#fff", fontSize: 26, fontWeight: "700" }}>
-          Library
+          Reservation
         </Text>
-        <Text style={{ color: "#dbeafe", marginTop: 4 }}>Browse books</Text>
       </View>
 
       <ScrollView
+        style={{ paddingHorizontal: 20 }}
         contentContainerStyle={{ padding: 20 }}
         refreshControl={
           <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
@@ -130,12 +128,12 @@ export default function ReservationView() {
       >
         {/* Search */}
         <TextInput
-          placeholder="Search books..."
+          placeholder="Search  reservation"
           value={search}
           onChangeText={setSearch}
           style={{
             backgroundColor: "#fff",
-            borderRadius: 14,
+            borderRadius: 5,
             paddingHorizontal: 16,
             paddingVertical: 12,
             fontSize: 15,
@@ -153,16 +151,6 @@ export default function ReservationView() {
           </Text>
         )}
 
-        <Text
-          style={{
-            fontWeight: "700",
-            fontSize: 20,
-            color: "#111827",
-            marginBottom: 14,
-          }}
-        >
-          Book Reservation Details
-        </Text>
 
         {/* Cards */}
         {loading ? (
@@ -174,9 +162,9 @@ export default function ReservationView() {
             No books found
           </Text>
         ) : (
-          filteredBooks.map((book) => (
+          filteredBooks.map((book, index) => (
             <View
-              key={book.id}
+              key={`${book.id}-${index}`}
               style={{
                 backgroundColor: "#fff",
                 borderRadius: 16,
@@ -186,7 +174,7 @@ export default function ReservationView() {
                 shadowOpacity: 0.05,
                 shadowRadius: 6,
                 elevation: 2,
-                width: width > 600 ? 500 : "100%",
+                width: "100%",
                 alignSelf: "center",
                 minHeight: 120,
                 justifyContent: "center",
@@ -249,7 +237,7 @@ export default function ReservationView() {
               <TouchableOpacity
                 onPress={() => handleSeeDetails(book)}
                 style={{
-                  backgroundColor: "#2563eb",
+                  backgroundColor: "#3498db",
                   borderRadius: 10,
                   paddingVertical: 10,
                   alignItems: "center",

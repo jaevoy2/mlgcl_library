@@ -33,7 +33,7 @@ export default function BorrowInfo() {
             }
 
         }catch(error: any) {
-            Alert.alert('Error', error.message);
+            Alert.alert('Invalid', error.message);
         }finally {
             setConfirmSpinnerr(false);
         }
