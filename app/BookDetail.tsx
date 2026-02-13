@@ -5,43 +5,41 @@ export default function BookDetail() {
   const params = useLocalSearchParams();
   const book = params.book ? JSON.parse(params.book as string) : null;
 
-  // Hardcoded reservation and borrowing details for demo
-  const reservations = [
-    { name: "Alice", date: "2026-02-01", expire_at: "2026-02-15" },
-    { name: "Bob", date: "2026-02-05", expire_at: "2026-02-20" },
-  ];
-  const borrowings = [
-    { name: "Charlie", date: "2026-02-10" },
-    { name: "Diana", date: "2026-02-11" },
-  ];
-
   if (!book) {
     return <Text>No book data found.</Text>;
   }
 
+  // Extract reservation and user info
+  const reservation = book.reservation;
+  const user = reservation?.user;
+
   return (
     <View style={styles.container}>
       <Text style={styles.title}>{book.title}</Text>
-      <Text style={styles.section}>Reservations:</Text>
-      {reservations.length === 0 ? (
-        <Text style={styles.empty}>No reservations.</Text>
-      ) : (
-        reservations.map((r, i) => (
-          <Text key={i} style={styles.item}>
-            {r.name} - {r.date}
-          </Text>
-        ))
-      )}
-      <Text style={styles.section}>Borrowings:</Text>
-      {borrowings.length === 0 ? (
-        <Text style={styles.empty}>No borrowings.</Text>
-      ) : (
-        borrowings.map((b, i) => (
-          <Text key={i} style={styles.item}>
-            {b.name} - {b.date}
-          </Text>
-        ))
-      )}
+      <View style={styles.detailsBox}>
+        <Text style={styles.section}>Reservation Details:</Text>
+        {reservation && user ? (
+          <View>
+            <Text style={styles.label}>
+              Reserved by:
+              <Text style={styles.value}>
+                {" "}
+                {user.name} ({user.email})
+              </Text>
+            </Text>
+            <Text style={styles.label}>
+              Status:
+              <Text style={styles.value}> {reservation.status}</Text>
+            </Text>
+            <Text style={styles.label}>
+              Reserved at:
+              <Text style={styles.value}> {reservation.created_at}</Text>
+            </Text>
+          </View>
+        ) : (
+          <Text style={styles.empty}>No reservation details.</Text>
+        )}
+      </View>
     </View>
   );
 }
@@ -49,7 +47,18 @@ export default function BookDetail() {
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: "#f4f6f8", padding: 24 },
   title: { fontSize: 24, fontWeight: "bold", marginBottom: 24 },
-  section: { fontSize: 18, fontWeight: "bold", marginTop: 16, marginBottom: 8 },
-  item: { fontSize: 16, marginBottom: 4 },
+  detailsBox: {
+    backgroundColor: "#fff",
+    borderRadius: 12,
+    padding: 18,
+    shadowColor: "#000",
+    shadowOpacity: 0.07,
+    shadowRadius: 6,
+    elevation: 2,
+    marginBottom: 24,
+  },
+  section: { fontSize: 18, fontWeight: "bold", marginBottom: 12 },
+  label: { fontSize: 16, fontWeight: "600", marginBottom: 6, color: "#374151" },
+  value: { fontWeight: "400", color: "#2563eb" },
   empty: { fontSize: 16, color: "#888" },
 });

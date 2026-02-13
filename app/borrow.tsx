@@ -85,8 +85,8 @@ export default function HomeScreen() {
         }
 
         const response = await ValidateUserQr(String(lastpart));
+        console.log(response)
         if(!response.error) {
-          console.log(response)
           updateBorrowedBook('userId', response.data.user.id)
           updateBorrowedBook('userName', response.data.full_name);
           updateBorrowedBook('userImage', response.data.image);
