@@ -199,7 +199,7 @@ export default function Index() {
                                     style={[styles.input, emailFocused && styles.inputFocused, { color: '#000' }]}
                                 />
                             </View>
-                            <View>
+                            <View style={{ width: '100%' }}>
                                 <Text style={{ fontSize: 13, color: '#fff', fontWeight: 'bold' }}>Password</Text>
                                 <View style={[styles.passwordInput, passwordFocused && styles.inputFocused]}>
                                 <TextInput

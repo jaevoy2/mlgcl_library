@@ -4,7 +4,7 @@ export async function FetchBorrowings() {
     const extras = Constants.expoConfig?.extra ?? {};
     const LIBRARY_API_URL = extras.LIBRARY_API_URL as string;
     const LIBRARY_API_KEY = extras.LIBRARY_API_KEY as string;
-    const LIBRARY_ORIGIN = extras.LIBRARY_API_ORIGIN as string;
+    const LIBRARY_ORIGIN = extras.LIBRARY_ORIGIN as string;
 
     try {
         const res = await fetch(`${LIBRARY_API_URL}borrowings/`, {
