@@ -103,41 +103,37 @@ export default function Index() {
     }
 
     const handleLogin = async () => {
-
-        router.replace("/(tabs)/dashboard");
-
-
-        // if(!email.trim() || !password.trim()) {
-        //     Alert.alert('Invalid', 'Email and password are required.');
+        if(!email.trim() || !password.trim()) {
+            Alert.alert('Invalid', 'Email and password are required.');
             
-        //     return;
-        // }
+            return;
+        }
 
-        // setLoginSpinner(true);
+        setLoginSpinner(true);
 
-        // const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-        // let randString = '';
+        const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+        let randString = '';
 
-        // for (let i = 0; i < 5; i++) {
-        //     randString += chars.charAt(Math.floor(Math.random() * chars.length));
-        // }
+        for (let i = 0; i < 5; i++) {
+            randString += chars.charAt(Math.floor(Math.random() * chars.length));
+        }
 
-        // try {
-        //     const response = await Login(email.trim(), password.trim(), randString);
+        try {
+            const response = await Login(email.trim(), password.trim(), randString);
 
-        //     if(!response.error) {
-        //         toggleSheet();
-        //         setSessionId(response.session_id);
-        //         await AsyncStorage.setItem('session_id', response.session_id);
-        //     }else {
-        //         Alert.alert('Invalid', 'Invalid credentials. Please try again.');
-        //     }
+            if(!response.error) {
+                toggleSheet();
+                setSessionId(response.session_id);
+                await AsyncStorage.setItem('session_id', response.session_id);
+            }else {
+                Alert.alert('Invalid', 'Invalid credentials. Please try again.');
+            }
 
-        // }catch(error: any) {
-        //     Alert.alert('Error', error.message)
-        // }finally {
-        //     setLoginSpinner(false)
-        // }
+        }catch(error: any) {
+            Alert.alert('Error', error.message)
+        }finally {
+            setLoginSpinner(false)
+        }
     }
 
     const handleOTPValidation = async () => {
