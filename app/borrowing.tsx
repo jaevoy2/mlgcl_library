@@ -128,43 +128,30 @@ export default function BorrowingsView() {
             onPress={() => handleCardPress(item)}
             activeOpacity={0.7}
         >
-            <View style={styles.cardHeader}>
-                <View style={{ flex: 1 }}>
-                    <Text style={styles.bookTitle} numberOfLines={2}>
-                        {item.book_copy?.book?.title || 'Unknown Book'}
+            <Text style={styles.bookTitle} numberOfLines={2}>
+                {item.book_copy?.book?.title || 'Unknown Book'}
+            </Text>
+
+            <View style={styles.userSection}>
+                <View style={styles.userAvatar}>
+                    <Text style={styles.userInitial}>
+                        {item.user?.name?.charAt(0).toUpperCase() || 'U'}
                     </Text>
                 </View>
+                <Text style={styles.userName}>
+                    {item.user?.name || 'Unknown User'}
+                </Text>
             </View>
-            
-            <View style={styles.cardContent}>
-                <View style={styles.userSection}>
-                    <View style={styles.userAvatar}>
-                        <Text style={styles.userInitial}>
-                            {item.user?.name?.charAt(0).toUpperCase() || 'U'}
-                        </Text>
-                    </View>
-                    <View style={{ flex: 1 }}>
-                        <Text style={styles.userName}>
-                            {item.user?.name || 'Unknown User'}
-                        </Text>
-                        {item.user?.email && (
-                            <Text style={styles.userEmail}>{item.user.email}</Text>
-                        )}
-                    </View>
-                </View>
 
-                <View style={styles.divider} />
+            <View style={styles.dateRow}>
+                <Ionicons name="calendar-outline" size={18} color="#5DADE2" />
+                <Text style={styles.dateLabel}>Borrowed:</Text>
+                <Text style={styles.dateValue}>{formatDate(item.borrowed_at)}</Text>
+            </View>
 
-                <View style={styles.infoRow}>
-                    <Ionicons name="calendar-outline" size={16} color="#27ae60" />
-                    <Text style={styles.infoLabel}>Borrowed:</Text>
-                    <Text style={styles.infoValue}>{formatDate(item.borrowed_at)}</Text>
-                </View>
-
-                <View style={styles.tapHintContainer}>
-                    <Text style={styles.tapHint}>Tap for details</Text>
-                    <Ionicons name="chevron-forward" size={16} color="#95a5a6" />
-                </View>
+            <View style={styles.tapHintContainer}>
+                <Text style={styles.tapHint}>Tap for details</Text>
+                <Ionicons name="chevron-forward" size={16} color="#B0BEC5" />
             </View>
         </TouchableOpacity>
     );
@@ -184,7 +171,7 @@ export default function BorrowingsView() {
                 <View style={styles.modalOverlay}>
                     <View style={styles.modalContent}>
                         <View style={styles.modalHeader}>
-                            <Text style={styles.modalTitle}>Borrowing Details</Text>
+                            <Text style={styles.modalTitle}>Borrowed Book Details</Text>
                             <TouchableOpacity onPress={closeModal} style={styles.closeButton}>
                                 <Ionicons name="close" size={28} color="#2c3e50" />
                             </TouchableOpacity>
@@ -299,7 +286,7 @@ export default function BorrowingsView() {
                     onPress={goToPreviousPage}
                     disabled={currentPage === 1}
                 >
-                    <Ionicons name="chevron-back" size={24} color={currentPage === 1 ? "#bdc3c7" : "#3498db"} />
+                    <Ionicons name="chevron-back" size={20} color={currentPage === 1 ? "#B0BEC5" : "#3498db"} />
                     <Text style={[styles.paginationButtonText, currentPage === 1 && styles.paginationButtonTextDisabled]}>
                         Previous
                     </Text>
@@ -312,56 +299,57 @@ export default function BorrowingsView() {
                 </View>
 
                 <TouchableOpacity 
-                    style={[styles.paginationButton, currentPage === totalPages && styles.paginationButtonDisabled]}
+                    style={[styles.paginationButton, styles.paginationButtonNext, currentPage === totalPages && styles.paginationButtonDisabled]}
                     onPress={goToNextPage}
                     disabled={currentPage === totalPages}
                 >
-                    <Text style={[styles.paginationButtonText, currentPage === totalPages && styles.paginationButtonTextDisabled]}>
+                    <Text style={[styles.paginationButtonText, styles.paginationButtonNextText, currentPage === totalPages && styles.paginationButtonTextDisabled]}>
                         Next
                     </Text>
-                    <Ionicons name="chevron-forward" size={24} color={currentPage === totalPages ? "#bdc3c7" : "#3498db"} />
+                    <Ionicons name="chevron-forward" size={20} color={currentPage === totalPages ? "#B0BEC5" : "#fff"} />
                 </TouchableOpacity>
             </View>
         );
     };
 
     return (
-        <View style={{ backgroundColor: '#fff', height }}>
-            <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', backgroundColor: '#3498db', height: 100, width, paddingTop: 40, paddingHorizontal: 20 }}>
-                <TouchableOpacity onPress={() => router.back()}>
-                    <Ionicons name={'arrow-back'} color={'#fff'} size={25} />
+        <View style={styles.container}>
+            {/* Header */}
+            <View style={styles.header}>
+                <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
+                    <Ionicons name={'arrow-back'} color={'#fff'} size={24} />
                 </TouchableOpacity>
-                <Text style={{ color: '#fff', fontSize: 18, fontWeight: 'bold' }}>Borrowings</Text>
-                <View style={{ width: 25 }} />
+                <Text style={styles.headerTitle}>Borrowings</Text>
+                <View style={styles.headerSpacer} />
             </View>
             
             {loading ? (
-                <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+                <View style={styles.loadingContainer}>
                     <ActivityIndicator size={'large'} color={'#3498db'} />
                 </View>
             ) : (
-                <View style={{ flex: 1, paddingHorizontal: 20, paddingVertical: 10 }}>
+                <View style={styles.content}>
                     {/* Search Input */}
                     <View style={styles.searchContainer}>
-                        <Ionicons name="search-outline" size={20} color="#7f8c8d" style={styles.searchIcon} />
+                        <Ionicons name="search-outline" size={22} color="#B0BEC5" style={styles.searchIcon} />
                         <TextInput
                             style={styles.searchInput}
                             placeholder="Search by book title or user..."
-                            placeholderTextColor="#95a5a6"
+                            placeholderTextColor="#B0BEC5"
                             value={searchQuery}
                             onChangeText={setSearchQuery}
                         />
                         {searchQuery.length > 0 && (
                             <TouchableOpacity onPress={clearSearch} style={styles.clearButton}>
-                                <Ionicons name="close-circle" size={20} color="#95a5a6" />
+                                <Ionicons name="close-circle" size={22} color="#B0BEC5" />
                             </TouchableOpacity>
                         )}
                     </View>
 
                     {filteredBorrowings.length === 0 ? (
-                        <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-                            <Ionicons name="file-tray-outline" size={64} color="#a8a8a8" />
-                            <Text style={{ color: '#a8a8a8', fontSize: 16, marginTop: 10 }}>
+                        <View style={styles.emptyContainer}>
+                            <Ionicons name="file-tray-outline" size={64} color="#B0BEC5" />
+                            <Text style={styles.emptyText}>
                                 {searchQuery ? 'No borrowings found matching your search' : 'No borrowings found'}
                             </Text>
                             {searchQuery && (
@@ -375,8 +363,8 @@ export default function BorrowingsView() {
                             <View style={styles.headerInfo}>
                                 <Text style={styles.totalText}>
                                     {searchQuery 
-                                        ? `Found: ${filteredBorrowings.length} borrowing${filteredBorrowings.length !== 1 ? 's' : ''}`
-                                        : `Total: ${borrowings.length} borrowing${borrowings.length !== 1 ? 's' : ''}`
+                                        ? `Total: ${filteredBorrowings.length} borrowings`
+                                        : `Total: ${borrowings.length} borrowings`
                                     }
                                 </Text>
                                 <Text style={styles.pageInfo}>
@@ -388,7 +376,7 @@ export default function BorrowingsView() {
                                 data={currentBorrowings}
                                 renderItem={renderBorrowingItem}
                                 keyExtractor={(item) => item.id.toString()}
-                                contentContainerStyle={{ paddingBottom: 20 }}
+                                contentContainerStyle={styles.listContent}
                                 showsVerticalScrollIndicator={false}
                             />
 
@@ -404,94 +392,140 @@ export default function BorrowingsView() {
 }
 
 const styles = StyleSheet.create({
+    container: {
+        flex: 1,
+        backgroundColor: '#F5F5F5',
+    },
+    header: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        backgroundColor: '#3498db',
+        paddingTop: 50,
+        paddingBottom: 20,
+        paddingHorizontal: 20,
+    },
+    backButton: {
+        padding: 4,
+    },
+    headerTitle: {
+        color: '#fff',
+        fontSize: 22,
+        fontWeight: '600',
+    },
+    headerSpacer: {
+        width: 32,
+    },
+    loadingContainer: {
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
+    content: {
+        flex: 1,
+        paddingHorizontal: 16,
+        paddingTop: 16,
+    },
     searchContainer: {
         flexDirection: 'row',
         alignItems: 'center',
-        backgroundColor: '#f8f9fa',
-        borderRadius: 10,
-        paddingHorizontal: 12,
-        paddingVertical: 10,
+        backgroundColor: '#FFFFFF',
+        borderRadius: 12,
+        paddingHorizontal: 16,
+        paddingVertical: 12,
         marginBottom: 16,
-        borderWidth: 1,
-        borderColor: '#e0e0e0',
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 1 },
+        shadowOpacity: 0.05,
+        shadowRadius: 2,
+        elevation: 2,
     },
     searchIcon: {
-        marginRight: 8,
+        marginRight: 10,
     },
     searchInput: {
         flex: 1,
-        fontSize: 16,
-        color: '#2c3e50',
+        fontSize: 15,
+        color: '#263238',
     },
     clearButton: {
         padding: 4,
     },
-    clearSearchButton: {
+    emptyContainer: {
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+        paddingHorizontal: 40,
+    },
+    emptyText: {
+        color: '#B0BEC5',
+        fontSize: 16,
         marginTop: 16,
-        paddingHorizontal: 20,
-        paddingVertical: 10,
+        textAlign: 'center',
+    },
+    clearSearchButton: {
+        marginTop: 20,
+        paddingHorizontal: 24,
+        paddingVertical: 12,
         backgroundColor: '#3498db',
-        borderRadius: 8,
+        borderRadius: 25,
     },
     clearSearchButtonText: {
         color: '#fff',
-        fontSize: 14,
+        fontSize: 15,
         fontWeight: '600',
     },
-    borrowingCard: {
-        backgroundColor: '#f8f9fa',
-        borderRadius: 12,
-        padding: 16,
-        marginBottom: 12,
-        borderWidth: 1,
-        borderColor: '#e0e0e0',
-        shadowColor: '#000',
-        shadowOffset: { width: 0, height: 2 },
-        shadowOpacity: 0.1,
-        shadowRadius: 4,
-        elevation: 3,
-    },
-    cardHeader: {
+    headerInfo: {
         flexDirection: 'row',
         justifyContent: 'space-between',
-        alignItems: 'flex-start',
-        marginBottom: 12,
-        paddingBottom: 12,
-        borderBottomWidth: 1,
-        borderBottomColor: '#e0e0e0',
-        gap: 12,
+        alignItems: 'center',
+        marginBottom: 16,
+        paddingHorizontal: 4,
+    },
+    totalText: {
+        fontSize: 14,
+        fontWeight: '500',
+        color: '#607D8B',
+    },
+    pageInfo: {
+        fontSize: 14,
+        fontWeight: '500',
+        color: '#607D8B',
+    },
+    listContent: {
+        paddingBottom: 20,
+    },
+    borrowingCard: {
+        backgroundColor: '#FFFFFF',
+        borderRadius: 16,
+        padding: 20,
+        marginBottom: 16,
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.08,
+        shadowRadius: 8,
+        elevation: 3,
     },
     bookTitle: {
-        fontSize: 18,
-        fontWeight: 'bold',
-        color: '#2c3e50',
-        marginBottom: 4,
-    },
-    statusBadge: {
-        paddingHorizontal: 12,
-        paddingVertical: 6,
-        borderRadius: 12,
-    },
-    statusText: {
-        color: '#fff',
-        fontSize: 12,
+        fontSize: 20,
         fontWeight: '600',
-    },
-    cardContent: {
-        gap: 10,
+        color: '#263238',
+        marginBottom: 16,
+        lineHeight: 26,
     },
     userSection: {
         flexDirection: 'row',
         alignItems: 'center',
         gap: 12,
-        backgroundColor: '#e3f2fd',
-        padding: 12,
-        borderRadius: 8,
+        backgroundColor: '#E3F2FD',
+        padding: 14,
+        borderRadius: 12,
+        marginBottom: 16,
     },
     userAvatar: {
-        width: 40,
-        height: 40,
-        borderRadius: 20,
+        width: 44,
+        height: 44,
+        borderRadius: 22,
         backgroundColor: '#3498db',
         justifyContent: 'center',
         alignItems: 'center',
@@ -504,28 +538,24 @@ const styles = StyleSheet.create({
     userName: {
         fontSize: 16,
         fontWeight: '600',
-        color: '#2c3e50',
+        color: '#263238',
+        flex: 1,
     },
-    userEmail: {
-        fontSize: 12,
-        color: '#7f8c8d',
-        marginTop: 2,
-    },
-    infoRow: {
+    dateRow: {
         flexDirection: 'row',
         alignItems: 'center',
         gap: 8,
+        marginBottom: 12,
     },
-    infoLabel: {
-        fontSize: 14,
-        color: '#7f8c8d',
+    dateLabel: {
+        fontSize: 15,
+        color: '#607D8B',
         fontWeight: '500',
-        minWidth: 80,
     },
-    infoValue: {
-        fontSize: 14,
-        color: '#2c3e50',
-        fontWeight: '600',
+    dateValue: {
+        fontSize: 15,
+        color: '#263238',
+        fontWeight: '500',
         flex: 1,
     },
     tapHintContainer: {
@@ -536,73 +566,57 @@ const styles = StyleSheet.create({
         marginTop: 4,
     },
     tapHint: {
-        fontSize: 12,
-        color: '#95a5a6',
-        fontStyle: 'italic',
-    },
-    divider: {
-        height: 1,
-        backgroundColor: '#e0e0e0',
-        marginVertical: 4,
-    },
-    headerInfo: {
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-        alignItems: 'center',
-        marginBottom: 16,
-        paddingBottom: 8,
-        borderBottomWidth: 1,
-        borderBottomColor: '#e0e0e0',
-    },
-    totalText: {
-        fontSize: 14,
-        fontWeight: '600',
-        color: '#2c3e50',
-    },
-    pageInfo: {
-        fontSize: 14,
-        color: '#7f8c8d',
+        fontSize: 13,
+        color: '#B0BEC5',
     },
     paginationContainer: {
         flexDirection: 'row',
         justifyContent: 'space-between',
         alignItems: 'center',
         paddingVertical: 20,
-        paddingHorizontal: 10,
+        paddingHorizontal: 4,
+        gap: 12,
     },
     paginationButton: {
         flexDirection: 'row',
         alignItems: 'center',
-        paddingHorizontal: 16,
-        paddingVertical: 10,
-        borderRadius: 8,
-        backgroundColor: '#fff',
+        paddingHorizontal: 20,
+        paddingVertical: 12,
+        borderRadius: 25,
+        backgroundColor: '#FFFFFF',
         borderWidth: 1,
-        borderColor: '#3498db',
+        borderColor: '#E0E0E0',
         gap: 6,
+        minWidth: 120,
+        justifyContent: 'center',
+    },
+    paginationButtonNext: {
+        backgroundColor: '#3498db',
+        borderColor: '#3498db',
     },
     paginationButtonDisabled: {
-        borderColor: '#bdc3c7',
-        backgroundColor: '#ecf0f1',
+        backgroundColor: '#F5F5F5',
+        borderColor: '#E0E0E0',
     },
     paginationButtonText: {
-        fontSize: 14,
+        fontSize: 15,
         fontWeight: '600',
         color: '#3498db',
     },
+    paginationButtonNextText: {
+        color: '#FFFFFF',
+    },
     paginationButtonTextDisabled: {
-        color: '#bdc3c7',
+        color: '#B0BEC5',
     },
     pageIndicatorContainer: {
-        paddingHorizontal: 20,
+        paddingHorizontal: 16,
         paddingVertical: 8,
-        backgroundColor: '#f0f0f0',
-        borderRadius: 20,
     },
     pageIndicatorText: {
-        fontSize: 14,
+        fontSize: 15,
         fontWeight: '600',
-        color: '#2c3e50',
+        color: '#263238',
     },
     // Modal Styles
     modalOverlay: {
@@ -692,22 +706,6 @@ const styles = StyleSheet.create({
     modalUserEmail: {
         fontSize: 14,
         color: '#7f8c8d',
-        marginBottom: 4,
-    },
-    modalUserId: {
-        fontSize: 12,
-        color: '#95a5a6',
-    },
-    modalStatusBadge: {
-        paddingHorizontal: 16,
-        paddingVertical: 8,
-        borderRadius: 20,
-        alignSelf: 'flex-start',
-    },
-    modalStatusText: {
-        color: '#fff',
-        fontSize: 14,
-        fontWeight: '600',
     },
     modalFooter: {
         paddingHorizontal: 20,

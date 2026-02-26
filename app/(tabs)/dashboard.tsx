@@ -1,10 +1,9 @@
 import { FetchBooks } from "@/api/books";
 import { Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { LinearGradient } from "expo-linear-gradient";
 import { router } from "expo-router";
 import { useEffect, useState } from "react";
-import { ActivityIndicator, Alert, Dimensions, Text, TouchableOpacity, View } from "react-native";
+import { ActivityIndicator, Alert, Dimensions, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 
 const { height, width } = Dimensions.get('window');
 const logo = require('@/assets/images/logo.png')
@@ -42,71 +41,208 @@ export default function BooksView() {
     } 
 
     return (
-        <View style={{ flex: 1, backgroundColor: '#fff', position: 'relative' }}>
+        <View style={styles.container}>
             {loading == true ? (
-                <View style={{ width, height, justifyContent: 'center', alignContent: 'center' }}>
+                <View style={styles.loadingContainer}>
                     <ActivityIndicator color={'#3498db'} size={'large'} />
                 </View>
             ) : (
                 <>
-                    <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', backgroundColor: '#3498db', height: 100, width, paddingTop: 40, paddingHorizontal: 20 }}>
-                        <Text style={{ fontWeight: '700', fontSize: 16, color: '#fff' }}>Boyet Dedal</Text>
-                        <View style={{ flexDirection: 'row', gap: 20 }}>
-                            <TouchableOpacity onPress={() => router.push('/search')}>
-                                <Ionicons name={'search'} color={'#fff'} size={25} />
-                            </TouchableOpacity>
-                            {/* <Ionicons name={'person-circle-outline'} size={28} color={'#fff'} /> */}
-                        </View>
+                    {/* Header */}
+                    <View style={styles.header}>
+                        <Text style={styles.headerTitle}>Boyet Dedal</Text>
+                        <TouchableOpacity onPress={() => router.push('/search')} style={styles.searchButton}>
+                            <Ionicons name={'search'} color={'#fff'} size={24} />
+                        </TouchableOpacity>
                     </View>
-                    <View style={{ paddingTop: 30, paddingHorizontal: 20, gap: 20 }}>
-                        <View style={{ flexDirection: 'row', alignItems: 'flex-start', justifyContent: 'space-between', width: '100%', height: 100, padding: 20, borderRadius: 10, shadowColor: "#000", position: 'relative' }}>
-                            <LinearGradient
-                                colors={['#3498db', 'rgba(52, 152, 219, 0.88)',  'rgb(82, 179, 243)',  'rgb(148, 205, 243)' ]}
-                                start={{ x: 0, y: 0 }}
-                                end={{ x: 0, y: 1 }}
-                                style={{ height: 100, position: 'absolute', width: width - 40 , bottom: 0, zIndex: -1, borderRadius: 10 }}
-                            />
-                            <View>
-                                <Text style={{ color: '#fff' }}>Books</Text>
-                                <View style={{ marginTop: 5, flexDirection: 'row', alignItems: 'center', gap: 10 }}>
-                                    <MaterialCommunityIcons name={'book-open-page-variant'} size={30} color={'#fff'} />
-                                    <Text style={{ fontWeight: '900', fontSize: 28, color: '#fff' }}>{bookCount}</Text>
+
+                    {/* Main Content */}
+                    <View style={styles.content}>
+                        {/* Books Card */}
+                        <View style={styles.card}>
+                            <View style={styles.cardContent}>
+                                <View style={styles.cardLeft}>
+                                    <Text style={styles.cardLabel}>Books</Text>
+                                    <View style={styles.cardValueRow}>
+                                        <MaterialCommunityIcons name={'book-open-page-variant'} size={32} color={'#fff'} />
+                                        <Text style={styles.cardValueLarge}>{bookCount}</Text>
+                                    </View>
                                 </View>
-                            </View>
-                            <View style={{ flexDirection: 'column', alignItems: 'flex-end' }}>
-                                <Text style={{ color: '#fff' }}>Book Copies</Text>
-                                <Text style={{ fontWeight: '900', fontSize: 20, color: '#fff' }}>{bookCopies}</Text>
+                                <View style={styles.cardRight}>
+                                    <Text style={styles.cardLabel}>Book Copies</Text>
+                                    <Text style={styles.cardValueMedium}>{bookCopies}</Text>
+                                </View>
                             </View>
                         </View>
 
-                        <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-end', width: '100%', height: 100, padding: 20, borderRadius: 10, shadowColor: "#000", position: 'relative' }}>
-                            <LinearGradient
-                                colors={['#3498db', 'rgba(52, 152, 219, 0.88)',  'rgb(82, 179, 243)', 'rgb(148, 205, 243)' ]}
-                                start={{ x: 0, y: 0 }}
-                                end={{ x: 0, y: 1 }}
-                                style={{ height: 100, position: 'absolute', width: width - 40 , bottom: 0, zIndex: -1, borderRadius: 10 }}
-                            />
-                            <View>
-                                <Text style={{ color: '#fff' }}>Borrowed Books</Text>
-                                <View style={{ marginTop: 5, flexDirection: 'row', alignItems: 'center', gap: 10 }}>
-                                    <MaterialCommunityIcons name={'book-open-page-variant'} size={30} color={'#fff'} />
-                                    <Text style={{ fontWeight: '900', fontSize: 28, color: '#fff' }}>{borrowedBooks}</Text>
+                        {/* Borrowed Books Card */}
+                        <View style={styles.card}>
+                            <View style={styles.cardContent}>
+                                <View style={styles.cardLeft}>
+                                    <Text style={styles.cardLabel}>Borrowed Books</Text>
+                                    <View style={styles.cardValueRow}>
+                                        <MaterialCommunityIcons name={'book-open-page-variant'} size={32} color={'#fff'} />
+                                        <Text style={styles.cardValueLarge}>{borrowedBooks}</Text>
+                                    </View>
                                 </View>
                             </View>
-                            <TouchableOpacity onPress={() => router.push('../borrowing')} style={{ flexDirection: 'row', alignItems: 'center', gap: 3 }}>
-                                <Ionicons name={'open-outline'} size={20} color={'#fff'} />
-                                <Text style={{ color: '#fff', fontSize: 16 }}>View</Text>
+                            <TouchableOpacity 
+                                onPress={() => router.push('../borrowing')} 
+                                style={styles.viewDetailsButton}
+                            >
+                                <Ionicons name={'open-outline'} size={18} color={'#fff'} />
+                                <Text style={styles.viewDetailsText}>View Details</Text>
                             </TouchableOpacity>
                         </View>
+
+                        {/* Footer Text */}
+                        <View style={styles.footer}>
+                            <Text style={styles.footerTitle}>MLG COLLEGE OF LEARNING, INC.</Text>
+                            <Text style={styles.footerSubtitle}>Library Management System v1.0</Text>
+                        </View>
                     </View>
-                    <TouchableOpacity onPress={() => router.push('/borrow')} style={{ padding: 20, backgroundColor: '#3498db', borderRadius: 50, position: 'absolute', right: 20, bottom: 50 }}>
-                        <MaterialCommunityIcons name={'qrcode-scan'} size={25} color={'#fff'} />
+
+                    {/* Floating Action Button */}
+                    <TouchableOpacity 
+                        onPress={() => router.push('/borrow')} 
+                        style={styles.fab}
+                    >
+                        <MaterialCommunityIcons name={'qrcode-scan'} size={28} color={'#fff'} />
                     </TouchableOpacity>
-                    {/* <TouchableOpacity onPress={() => handleLogout()} style={{ padding: 20, backgroundColor: '#3498db', borderRadius: 50, position: 'absolute', right: 20, bottom: 50 }}>
-                        <Text>Logout</Text>
-                    </TouchableOpacity> */}
                 </>
             )}
         </View>
     )
 }
+
+const styles = StyleSheet.create({
+    container: {
+        flex: 1,
+        backgroundColor: '#F5F5F5',
+        position: 'relative',
+    },
+    loadingContainer: {
+        width,
+        height,
+        justifyContent: 'center',
+        alignContent: 'center',
+    },
+    header: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        backgroundColor: '#3498db',
+        paddingTop: 50,
+        paddingBottom: 20,
+        paddingHorizontal: 20,
+    },
+    headerTitle: {
+        fontWeight: '700',
+        fontSize: 24,
+        color: '#fff',
+    },
+    searchButton: {
+        padding: 5,
+    },
+    content: {
+        flex: 1,
+        paddingTop: 20,
+        paddingHorizontal: 20,
+    },
+    card: {
+        backgroundColor: '#5DADE2',
+        borderRadius: 20,
+        padding: 24,
+        marginBottom: 20,
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 4 },
+        shadowOpacity: 0.15,
+        shadowRadius: 8,
+        elevation: 5,
+    },
+    cardContent: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'flex-start',
+    },
+    cardLeft: {
+        flex: 1,
+    },
+    cardRight: {
+        alignItems: 'flex-end',
+    },
+    cardLabel: {
+        color: '#FFFFFF',
+        fontSize: 16,
+        fontWeight: '500',
+        marginBottom: 10,
+        opacity: 0.95,
+    },
+    cardValueRow: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        gap: 12,
+    },
+    cardValueLarge: {
+        fontWeight: '900',
+        fontSize: 48,
+        color: '#fff',
+        lineHeight: 56,
+    },
+    cardValueMedium: {
+        fontWeight: '900',
+        fontSize: 36,
+        color: '#fff',
+        marginTop: 5,
+    },
+    viewDetailsButton: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        gap: 8,
+        backgroundColor: 'rgba(255, 255, 255, 0.25)',
+        paddingVertical: 10,
+        paddingHorizontal: 20,
+        borderRadius: 25,
+        alignSelf: 'flex-end',
+        marginTop: 15,
+    },
+    viewDetailsText: {
+        color: '#fff',
+        fontSize: 15,
+        fontWeight: '600',
+    },
+    footer: {
+        alignItems: 'center',
+        marginTop: 40,
+    },
+    footerTitle: {
+        fontSize: 13,
+        fontWeight: '600',
+        color: '#A0B8C5',
+        letterSpacing: 1,
+        textAlign: 'center',
+    },
+    footerSubtitle: {
+        fontSize: 11,
+        fontWeight: '400',
+        color: '#C5D4DB',
+        marginTop: 5,
+        textAlign: 'center',
+    },
+    fab: {
+        position: 'absolute',
+        right: 20,
+        bottom: 100,
+        width: 64,
+        height: 64,
+        borderRadius: 32,
+        backgroundColor: '#3498db',
+        justifyContent: 'center',
+        alignItems: 'center',
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 4 },
+        shadowOpacity: 0.3,
+        shadowRadius: 8,
+        elevation: 8,
+    },
+});

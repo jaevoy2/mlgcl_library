@@ -1,6 +1,6 @@
-import { MaterialCommunityIcons } from "@expo/vector-icons";
+import { Ionicons } from "@expo/vector-icons";
 import { Tabs } from "expo-router";
-import { StatusBar, Text, View } from "react-native";
+import { StatusBar, StyleSheet, Text } from "react-native";
 import "react/compiler-runtime";
 
 export default function TabsLayout() {
@@ -15,25 +15,25 @@ export default function TabsLayout() {
       <Tabs
         screenOptions={{
           headerShown: false,
-          tabBarStyle: { height: 60 },
+          tabBarStyle: styles.tabBar,
+          tabBarActiveTintColor: "#3498db",
+          tabBarInactiveTintColor: "#A0A0A0",
         }}
       >
         <Tabs.Screen
           name="dashboard"
           options={{
             tabBarLabel: ({ focused }) => (
-              <Text style={{ color: focused ? "#3498db" : "transparent" }}>
-                {focused ? "Dashboard" : ""}
+              <Text style={[styles.tabLabel, focused && styles.tabLabelActive]}>
+                Dashboard
               </Text>
             ),
             tabBarIcon: ({ focused }) => (
-              <View>
-                <MaterialCommunityIcons
-                  name={focused ? "view-dashboard" : "view-dashboard-outline"}
-                  color={focused ? "#3498db" : "#696969"}
-                  size={focused ? 28 : 32}
-                />
-              </View>
+              <Ionicons
+                name={'grid'}
+                color={focused ? "#3498db" : "#A0A0A0"}
+                size={24}
+              />
             ),
           }}
         />
@@ -42,39 +42,34 @@ export default function TabsLayout() {
           name="reservation"
           options={{
             tabBarLabel: ({ focused }) => (
-              <View>
-                <Text style={{ color: focused ? "#3498db" : "transparent" }}>
-                  {focused ? "Reservations" : ""}
-                </Text>
-              </View>
+              <Text style={[styles.tabLabel, focused && styles.tabLabelActive]}>
+                Reservations
+              </Text>
             ),
             tabBarIcon: ({ focused }) => (
-              <View>
-                <MaterialCommunityIcons
-                  name={focused ? "bookmark" : "bookmark-outline"}
-                  color={focused ? "#3498db" : "#696969"}
-                  size={focused ? 28 : 32}
-                />
-              </View>
+              <Ionicons
+                name={'bookmark-outline'}
+                color={focused ? "#3498db" : "#A0A0A0"}
+                size={24}
+              />
             ),
           }}
         />
+
         <Tabs.Screen
           name="returnbook"
           options={{
             tabBarLabel: ({ focused }) => (
-              <Text style={{ color: focused ? "#3498db" : "transparent" }}>
-                {focused ? "Return Book" : ""}
+              <Text style={[styles.tabLabel, focused && styles.tabLabelActive]}>
+                Return Book
               </Text>
             ),
             tabBarIcon: ({ focused }) => (
-              <View>
-                <MaterialCommunityIcons
-                  name={focused ? "arrow-u-left-top" : "arrow-u-left-top"}
-                  color={focused ? "#3498db" : "#696969"}
-                  size={focused ? 28 : 32}
-                />
-              </View>
+              <Ionicons
+                name={'arrow-undo-outline'}
+                color={focused ? "#3498db" : "#A0A0A0"}
+                size={24}
+              />
             ),
           }}
         />
@@ -82,3 +77,29 @@ export default function TabsLayout() {
     </>
   );
 }
+
+const styles = StyleSheet.create({
+  tabBar: {
+    height: 70,
+    paddingBottom: 10,
+    paddingTop: 10,
+    backgroundColor: '#FFFFFF',
+    borderTopWidth: 1,
+    borderTopColor: '#E5E5E5',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: -2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 10,
+  },
+  tabLabel: {
+    fontSize: 12,
+    fontWeight: '500',
+    color: '#A0A0A0',
+    marginTop: 4,
+  },
+  tabLabelActive: {
+    color: '#3498db',
+    fontWeight: '600',
+  },
+});
