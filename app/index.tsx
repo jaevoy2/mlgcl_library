@@ -150,9 +150,8 @@ export default function Index() {
             if(!response.error) {
                 await AsyncStorage.setItem('device_token', response.device_token);
                 await AsyncStorage.setItem('access_token', response.access_token);
-                console.log(response.access_token)
 
-                router.push('/(tabs)/dashboard')
+                router.replace('/(tabs)/dashboard')
             }
         }catch(error: any) {
             Alert.alert('Error', error.message);
@@ -199,7 +198,7 @@ export default function Index() {
                                     style={[styles.input, emailFocused && styles.inputFocused, { color: '#000' }]}
                                 />
                             </View>
-                            <View>
+                            <View style={{ width: '100%' }}>
                                 <Text style={{ fontSize: 13, color: '#fff', fontWeight: 'bold' }}>Password</Text>
                                 <View style={[styles.passwordInput, passwordFocused && styles.inputFocused]}>
                                 <TextInput
