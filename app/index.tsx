@@ -1,420 +1,578 @@
-import { OTPValidation } from '@/api/OtpValidation';
-import { Ionicons } from '@expo/vector-icons';
+import { OTPValidation } from "@/api/OtpValidation";
+import { Ionicons } from "@expo/vector-icons";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { LinearGradient } from 'expo-linear-gradient';
-import { useRouter } from 'expo-router';
-import { useEffect, useRef, useState } from 'react';
-import { ActivityIndicator, Alert, Animated, Dimensions, Image, Keyboard, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
-import { OtpInput } from 'react-native-otp-entry';
+import { LinearGradient } from "expo-linear-gradient";
+import { useRouter } from "expo-router";
+import { useEffect, useRef, useState } from "react";
+import {
+    ActivityIndicator,
+    Alert,
+    Animated,
+    Dimensions,
+    Image,
+    Keyboard,
+    StyleSheet,
+    Text,
+    TextInput,
+    TouchableOpacity,
+    View,
+} from "react-native";
+import { OtpInput } from "react-native-otp-entry";
 
-const logo = require('../assets/images/logo-name.png');
-const { height, width } = Dimensions.get('screen');
-
+const logo = require("../assets/images/logo-name.png");
+const { height, width } = Dimensions.get("screen");
 
 export default function Index() {
-    const [screenLoading, setScreenLoading] = useState(true);
-    const [email, setEmail] = useState('');
-    const [password, setPassword] = useState('');
-    const [isPasswordVisible, setIsPasswordVisible] = useState(false);
-    const [emailFocused, setEmailFocused] = useState(false);
-    const [passwordFocused, setPasswordFocused] = useState(false);
-    const [loginSpinner, setLoginSpinner] = useState(false);
-    const [sessionId, setSessionId] = useState('');
-    const [otpSpinner, setOtpSpinner] = useState(false);
-    const [otpCode, setOtpCode] = useState('');
-    const [isActive, setIsActive] = useState(false)
-    const [timeLeft, setTimeLeft] = useState(120);
-    const [overlay, setOverlay] = useState(false);
-    const translateY = useRef(new Animated.Value(height)).current;
-    const fadeInAnim = useRef(new Animated.Value(0)).current;
-    const router = useRouter();
+  const [screenLoading, setScreenLoading] = useState(true);
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [isPasswordVisible, setIsPasswordVisible] = useState(false);
+  const [emailFocused, setEmailFocused] = useState(false);
+  const [passwordFocused, setPasswordFocused] = useState(false);
+  const [loginSpinner, setLoginSpinner] = useState(false);
+  const [sessionId, setSessionId] = useState("");
+  const [otpSpinner, setOtpSpinner] = useState(false);
+  const [otpCode, setOtpCode] = useState("");
+  const [isActive, setIsActive] = useState(false);
+  const [timeLeft, setTimeLeft] = useState(120);
+  const [overlay, setOverlay] = useState(false);
+  const translateY = useRef(new Animated.Value(height)).current;
+  const fadeInAnim = useRef(new Animated.Value(0)).current;
+  const router = useRouter();
 
-    useEffect(() => {
-        const checkToken = async function getToken() {
-            const token = await AsyncStorage.getItem('device_token');
+  useEffect(() => {
+    const checkToken = async function getToken() {
+      const token = await AsyncStorage.getItem("device_token");
 
-            setTimeout(() => {
-                if(token) {
-                    router.push('/dashboard')
-                }
-                setScreenLoading(false);
-            }, 600)
+      setTimeout(() => {
+        if (token) {
+          router.push("/dashboard");
         }
+        setScreenLoading(false);
+      }, 600);
+    };
 
-        checkToken();
-    }, [])
+    checkToken();
+  }, []);
 
-    useEffect(() => {
-        let timer: ReturnType<typeof setInterval>
+  useEffect(() => {
+    let timer: ReturnType<typeof setInterval>;
 
-        if(isActive) {
-            if(timeLeft > 0) {
-                timer = setInterval(() => {
-                    setTimeLeft((prev) => prev - 1  )
-                }, 1000);
-            }else if(timeLeft == 0) {
-                setIsActive(false);
-            }
-        }
-
-        return () => clearInterval(timer);
-    }, [isActive, timeLeft])
-
-    const resetTimer = () => {
-        setTimeLeft(120);
-        setIsActive(true);
+    if (isActive) {
+      if (timeLeft > 0) {
+        timer = setInterval(() => {
+          setTimeLeft((prev) => prev - 1);
+        }, 1000);
+      } else if (timeLeft == 0) {
+        setIsActive(false);
+      }
     }
 
-    const toggleSheet = () => {
-        setOverlay(true);
-        
-        fadeIn()
-        setIsActive(true);
-        Animated.timing(translateY, {
-        toValue: 0,
-        useNativeDriver: true,
-        }).start();
+    return () => clearInterval(timer);
+  }, [isActive, timeLeft]);
+
+  const resetTimer = () => {
+    setTimeLeft(120);
+    setIsActive(true);
+  };
+
+  const toggleSheet = () => {
+    setOverlay(true);
+
+    fadeIn();
+    setIsActive(true);
+    Animated.timing(translateY, {
+      toValue: 0,
+      useNativeDriver: true,
+    }).start();
+  };
+
+  const fadeIn = () => {
+    Animated.timing(fadeInAnim, {
+      toValue: 1,
+      duration: 500,
+      useNativeDriver: true,
+    }).start();
+  };
+
+  const closeSheet = () => {
+    fadeClose();
+    setOverlay(false);
+
+    Animated.timing(translateY, {
+      toValue: height,
+      useNativeDriver: true,
+    }).start();
+  };
+
+  const fadeClose = () => {
+    Animated.timing(fadeInAnim, {
+      toValue: 1,
+      duration: 500,
+      useNativeDriver: true,
+    }).start();
+  };
+
+  const handleLogin = async () => {
+    if (!email.trim() || !password.trim()) {
+      Alert.alert("Invalid", "Email and password are required.");
+
+      return;
     }
 
-    const fadeIn = () => {
-        Animated.timing(fadeInAnim, {
-        toValue: 1,
-        duration: 500,
-        useNativeDriver: true,
-        }).start();
+    setLoginSpinner(true);
+
+    const chars =
+      "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+    let randString = "";
+
+    for (let i = 0; i < 5; i++) {
+      randString += chars.charAt(Math.floor(Math.random() * chars.length));
     }
 
-    const closeSheet = () => {
-        fadeClose();
-        setOverlay(false);
-        
-        Animated.timing(translateY, {
-        toValue: height,
-        useNativeDriver: true,
-        }).start();
+    try {
+      const response = await Login(email.trim(), password.trim(), randString);
+
+      if (!response.error) {
+        toggleSheet();
+        setSessionId(response.session_id);
+        await AsyncStorage.setItem("session_id", response.session_id);
+      } else {
+        Alert.alert("Invalid", "Invalid credentials. Please try again.");
+      }
+    } catch (error: any) {
+      Alert.alert("Error", error.message);
+    } finally {
+      setLoginSpinner(false);
+    }
+  };
+
+  const handleOTPValidation = async () => {
+    if (!otpCode.trim()) {
+      Alert.alert("Invalid", "OTP code is required.");
+      return;
     }
 
-    const fadeClose = () => {
-        Animated.timing(fadeInAnim, {
-        toValue: 1,
-        duration: 500,
-        useNativeDriver: true,
-        }).start();
+    setOtpSpinner(true);
+    try {
+      const response = await OTPValidation(Number(otpCode), sessionId);
+
+      if (!response.error) {
+        await AsyncStorage.setItem("device_token", response.device_token);
+        await AsyncStorage.setItem("access_token", response.access_token);
+
+        router.replace("/(tabs)/dashboard");
+      }
+    } catch (error: any) {
+      Alert.alert("Error", error.message);
+    } finally {
+      setOtpSpinner(false);
     }
+  };
 
-    const handleLogin = async () => {
-        if(!email.trim() || !password.trim()) {
-            Alert.alert('Invalid', 'Email and password are required.');
-            
-            return;
-        }
+  const handleResendOtp = () => {
+    resetTimer();
+    handleLogin();
+  };
 
-        setLoginSpinner(true);
-
-        const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-        let randString = '';
-
-        for (let i = 0; i < 5; i++) {
-            randString += chars.charAt(Math.floor(Math.random() * chars.length));
-        }
-
-        try {
-            const response = await Login(email.trim(), password.trim(), randString);
-
-            if(!response.error) {
-                toggleSheet();
-                setSessionId(response.session_id);
-                await AsyncStorage.setItem('session_id', response.session_id);
-            }else {
-                Alert.alert('Invalid', 'Invalid credentials. Please try again.');
-            }
-
-        }catch(error: any) {
-            Alert.alert('Error', error.message)
-        }finally {
-            setLoginSpinner(false)
-        }
-    }
-
-    const handleOTPValidation = async () => {
-        if(!otpCode.trim()) {
-            Alert. alert('Invalid', 'OTP code is required.');
-            return;
-        }
-
-        setOtpSpinner(true);
-        try {
-            const response = await OTPValidation(Number(otpCode), sessionId);
-            
-            if(!response.error) {
-                await AsyncStorage.setItem('device_token', response.device_token);
-                await AsyncStorage.setItem('access_token', response.access_token);
-
-                router.replace('/(tabs)/dashboard')
-            }
-        }catch(error: any) {
-            Alert.alert('Error', error.message);
-        }finally {
-            setOtpSpinner(false)
-        }
-    }
-
-    const handleResendOtp = () => {
-        resetTimer();
-        handleLogin();
-    }
-
-    return (
-        <View style={{ flex: 1 }}>
-            {screenLoading == true ? (
-                <View style={{ justifyContent: 'center', height }}>
-                    <ActivityIndicator color={'#3498db'} size={'large'} />
-                </View>
-            ) : (
-                <>
-                    <LinearGradient
-                        colors={['#4FB3E3', '#52B8E6', '#7DD4F7', '#B8E6A5', '#E8D97B', '#F4CD5D']}
-                        start={{ x: 0.5, y: 0 }}
-                        end={{ x: 0.5, y: 1 }}
-                        style={{ height, position: 'absolute', width, top: 0, zIndex: 1 }}
-                    />
-                    <View style={{paddingTop: 120, alignItems: 'center', height, zIndex: 10, paddingHorizontal: 30 }}>
-                        <View style={styles.logoContainer}>
-                            <View style={styles.logoCircle}>
-                                <Image source={logo} style={{ height: 40, width: 40, tintColor: '#fff' }} resizeMode="contain" />
-                            </View>
-                        </View>
-
-                        <View style={{ alignItems: 'center', marginTop: 30, marginBottom: 10 }}>
-                            <Text style={styles.collegeText}>MLG COLLEGE OF LEARNING, INC.</Text>
-                            <Text style={styles.locationText}>BRGY. ATABAY, HILONGOS, LEYTE</Text>
-                        </View>
-
-                        <View style={{ flexDirection: 'column', alignItems: 'center', width: '100%', marginTop: 20 }}>
-                            <Text style={styles.titleText}>MLGCL LIBRARY</Text>
-                            
-                            <View style={{ width: '100%', marginTop: 40 }}>
-                                <Text style={styles.label}>Email</Text>
-                                <TextInput
-                                    placeholder="Enter your email"
-                                    placeholderTextColor="#A8CBDB"
-                                    value={email}
-                                    onChangeText={setEmail}
-                                    keyboardType="email-address"
-                                    autoCapitalize="none"
-                                    onFocus={() => setEmailFocused(true)}
-                                    onBlur={() => setEmailFocused(false)}
-                                    style={[styles.input, emailFocused && styles.inputFocused]}
-                                />
-                            </View>
-                            <View style={{ width: '100%', marginTop: 20 }}>
-                                <Text style={styles.label}>Password</Text>
-                                <View style={[styles.passwordInput, passwordFocused && styles.inputFocused]}>
-                                    <TextInput
-                                        placeholder="Enter your password"
-                                        placeholderTextColor="#A8CBDB"
-                                        value={password}
-                                        onChangeText={setPassword}
-                                        autoCapitalize="none"
-                                        secureTextEntry={!isPasswordVisible}
-                                        onFocus={() => setPasswordFocused(true)}
-                                        onBlur={() => setPasswordFocused(false)}
-                                        style={{ flex: 1, color: '#2C5F7B', fontSize: 15 }}
-                                    />
-                                    <TouchableOpacity onPress={() => setIsPasswordVisible(!isPasswordVisible)} style={{ paddingHorizontal: 15 }}>
-                                        {isPasswordVisible == true ? (
-                                            <Ionicons name="lock-open" color={'#7DB8D1'} size={22} />
-                                        ) : (
-                                            <Ionicons name="lock-closed" color={'#7DB8D1'} size={22} />
-                                        )}
-                                    </TouchableOpacity>
-                                </View>
-                            </View>
-                            
-                            <TouchableOpacity 
-                                disabled={loginSpinner} 
-                                onPress={() => handleLogin()} 
-                                style={[styles.button, {backgroundColor: loginSpinner == true ? '#F5C557' : '#F5B840'}]} 
-                            >
-                                {loginSpinner == true ? (
-                                    <ActivityIndicator size={'small'} color={'#fff'} style={{ alignSelf: 'center' }} />
-                                ) : (
-                                    <Text style={styles.buttonText}>LOGIN</Text>
-                                )}
-                            </TouchableOpacity>
-                        </View>
-
-                        <View style={styles.footer}>
-                            <Text style={styles.footerText}>LIBRARY SCANNER APP V1.0</Text>
-                        </View>
-
-                        {overlay == true && (
-                        <Animated.View style={{ backgroundColor: '#00000065', width: width, height: height, opacity: fadeInAnim, position: 'absolute' }} />
-                        )}
-                        <Animated.View style={{ position: 'absolute', bottom: 0, width: width, height: height - 280, transform: [{ translateY: translateY }], backgroundColor: '#FAFAFA', borderTopLeftRadius: 30, borderTopRightRadius: 30, zIndex: 5, paddingHorizontal: 25, paddingTop: 30 }}>
-                            <View>
-                                <Text style={{ fontSize: 18, fontWeight: 'bold' }}>Enter 6 Digits Code</Text>
-                                <Text style={{ fontSize: 13, marginTop: 25, color: '#545454' }}>Please enter verification code sent to your registered mlgcl email.</Text>
-                                <View style={{ marginTop: 20 }}>
-                                    <OtpInput numberOfDigits={6} focusColor={'#3498db'} autoFocus={false} onTextChange={(text) => {
-                                        setOtpCode(text);
-                                        if(text.length == 6) {
-                                            Keyboard.dismiss();
-                                        }
-                                    }} />
-                                </View>
-                                <View style={{ flexDirection: 'row', alignSelf: 'center', marginTop: 10 }}>
-                                    <Text style={{ fontSize: 12, color: '#545454' }}>Didn't receive a code? </Text>
-                                    <TouchableOpacity onPress={() => handleResendOtp()}  disabled={isActive} >
-                                        <Text style={{ fontSize: 12, textDecorationLine: 'underline', color: isActive == true ? '#78bdebff' : '#3498db' }}>Resend code</Text>
-                                    </TouchableOpacity>
-                                    {isActive && (
-                                    <>
-                                        <Text>{` (${timeLeft})`}</Text>
-                                    </>
-                                    )}
-                                </View>
-                            </View>
-                            <View style={{ flex: 1, position: 'relative' }}>
-                                <TouchableOpacity onPress={() => handleOTPValidation()} disabled={otpSpinner} style={{ backgroundColor: otpSpinner == true ? '#5faee2ff' : '#3498db', width: width - 20,
-                                    borderRadius: 30, paddingVertical: 12, position: 'absolute', bottom: 60, left: '50%', transform: [{ translateX: '-50%' }] }}>
-                                    {otpSpinner == true ? (
-                                        <ActivityIndicator size={'small'} color={'#fff'} style={{ alignSelf: 'center' }} />
-                                    ) : (
-                                        <Text style={{ color: '#fff', fontWeight: 'bold', textAlign: 'center', fontSize: 16 }}>Verify</Text>
-                                    )}
-                                </TouchableOpacity>
-                                <TouchableOpacity onPress={() => closeSheet()} style={{ position: 'absolute', bottom: 25, left: '50%', transform: [{ translateX: '-50%' }] }}>
-                                    <Text style={{ fontWeight: 'bold', textAlign: 'center', color: '#838383', fontSize: 16 }}>Cancel</Text>
-                                </TouchableOpacity>
-                            </View>
-                        </Animated.View>
-                    </View>
-                </>
-            )}
+  return (
+    <View style={{ flex: 1 }}>
+      {screenLoading == true ? (
+        <View style={{ justifyContent: "center", height }}>
+          <ActivityIndicator color={"#3498db"} size={"large"} />
         </View>
-    )
+      ) : (
+        <>
+          <LinearGradient
+            colors={[
+              "#4FB3E3",
+              "#52B8E6",
+              "#7DD4F7",
+              "#B8E6A5",
+              "#E8D97B",
+              "#F4CD5D",
+            ]}
+            start={{ x: 0.5, y: 0 }}
+            end={{ x: 0.5, y: 1 }}
+            style={{ height, position: "absolute", width, top: 0, zIndex: 1 }}
+          />
+          <View
+            style={{
+              paddingTop: 120,
+              alignItems: "center",
+              height,
+              zIndex: 10,
+              paddingHorizontal: 30,
+            }}
+          >
+            <View style={styles.logoContainer}>
+              <View style={styles.logoCircle}>
+                <Image
+                  source={logo}
+                  style={{ height: 40, width: 40, tintColor: "#fff" }}
+                  resizeMode="contain"
+                />
+              </View>
+            </View>
+
+            <View
+              style={{ alignItems: "center", marginTop: 30, marginBottom: 10 }}
+            >
+              <Text style={styles.collegeText}>
+                MLG COLLEGE OF LEARNING, INC.
+              </Text>
+              <Text style={styles.locationText}>
+                BRGY. ATABAY, HILONGOS, LEYTE
+              </Text>
+            </View>
+
+            <View
+              style={{
+                flexDirection: "column",
+                alignItems: "center",
+                width: "100%",
+                marginTop: 20,
+              }}
+            >
+              <Text style={styles.titleText}>MLGCL LIBRARY</Text>
+
+              <View style={{ width: "100%", marginTop: 40 }}>
+                <Text style={styles.label}>Email</Text>
+                <TextInput
+                  placeholder="Enter your email"
+                  placeholderTextColor="#A8CBDB"
+                  value={email}
+                  onChangeText={setEmail}
+                  keyboardType="email-address"
+                  autoCapitalize="none"
+                  onFocus={() => setEmailFocused(true)}
+                  onBlur={() => setEmailFocused(false)}
+                  style={[styles.input, emailFocused && styles.inputFocused]}
+                />
+              </View>
+              <View style={{ width: "100%", marginTop: 20 }}>
+                <Text style={styles.label}>Password</Text>
+                <View
+                  style={[
+                    styles.passwordInput,
+                    passwordFocused && styles.inputFocused,
+                  ]}
+                >
+                  <TextInput
+                    placeholder="Enter your password"
+                    placeholderTextColor="#A8CBDB"
+                    value={password}
+                    onChangeText={setPassword}
+                    autoCapitalize="none"
+                    secureTextEntry={!isPasswordVisible}
+                    onFocus={() => setPasswordFocused(true)}
+                    onBlur={() => setPasswordFocused(false)}
+                    style={{ flex: 1, color: "#2C5F7B", fontSize: 15 }}
+                  />
+                  <TouchableOpacity
+                    onPress={() => setIsPasswordVisible(!isPasswordVisible)}
+                    style={{ paddingHorizontal: 15 }}
+                  >
+                    {isPasswordVisible == true ? (
+                      <Ionicons name="lock-open" color={"#7DB8D1"} size={22} />
+                    ) : (
+                      <Ionicons
+                        name="lock-closed"
+                        color={"#7DB8D1"}
+                        size={22}
+                      />
+                    )}
+                  </TouchableOpacity>
+                </View>
+              </View>
+
+              <TouchableOpacity
+                disabled={loginSpinner}
+                onPress={() => handleLogin()}
+                style={[
+                  styles.button,
+                  {
+                    backgroundColor:
+                      loginSpinner == true ? "#F5C557" : "#F5B840",
+                  },
+                ]}
+              >
+                {loginSpinner == true ? (
+                  <ActivityIndicator
+                    size={"small"}
+                    color={"#fff"}
+                    style={{ alignSelf: "center" }}
+                  />
+                ) : (
+                  <Text style={styles.buttonText}>LOGIN</Text>
+                )}
+              </TouchableOpacity>
+            </View>
+
+            <View style={styles.footer}>
+              <Text style={styles.footerText}>LIBRARY SCANNER APP V1.0</Text>
+            </View>
+
+            {overlay == true && (
+              <Animated.View
+                style={{
+                  backgroundColor: "#00000065",
+                  width: width,
+                  height: height,
+                  opacity: fadeInAnim,
+                  position: "absolute",
+                }}
+              />
+            )}
+            <Animated.View
+              style={{
+                position: "absolute",
+                bottom: 0,
+                width: width,
+                height: height - 280,
+                transform: [{ translateY: translateY }],
+                backgroundColor: "#FAFAFA",
+                borderTopLeftRadius: 30,
+                borderTopRightRadius: 30,
+                zIndex: 5,
+                paddingHorizontal: 25,
+                paddingTop: 30,
+              }}
+            >
+              <View>
+                <Text style={{ fontSize: 18, fontWeight: "bold" }}>
+                  Enter 6 Digits Code
+                </Text>
+                <Text style={{ fontSize: 13, marginTop: 25, color: "#545454" }}>
+                  Please enter verification code sent to your registered mlgcl
+                  email.
+                </Text>
+                <View style={{ marginTop: 20 }}>
+                  <OtpInput
+                    numberOfDigits={6}
+                    focusColor={"#3498db"}
+                    autoFocus={false}
+                    onTextChange={(text) => {
+                      setOtpCode(text);
+                      if (text.length == 6) {
+                        Keyboard.dismiss();
+                      }
+                    }}
+                  />
+                </View>
+                <View
+                  style={{
+                    flexDirection: "row",
+                    alignSelf: "center",
+                    marginTop: 10,
+                  }}
+                >
+                  <Text style={{ fontSize: 12, color: "#545454" }}>
+                    Didn't receive a code?{" "}
+                  </Text>
+                  <TouchableOpacity
+                    onPress={() => handleResendOtp()}
+                    disabled={isActive}
+                  >
+                    <Text
+                      style={{
+                        fontSize: 12,
+                        textDecorationLine: "underline",
+                        color: isActive == true ? "#78bdebff" : "#3498db",
+                      }}
+                    >
+                      Resend code
+                    </Text>
+                  </TouchableOpacity>
+                  {isActive && (
+                    <>
+                      <Text>{` (${timeLeft})`}</Text>
+                    </>
+                  )}
+                </View>
+              </View>
+              <View style={{ flex: 1, position: "relative" }}>
+                <TouchableOpacity
+                  onPress={() => handleOTPValidation()}
+                  disabled={otpSpinner}
+                  style={{
+                    backgroundColor:
+                      otpSpinner == true ? "#5faee2ff" : "#3498db",
+                    width: width - 20,
+                    borderRadius: 30,
+                    paddingVertical: 12,
+                    position: "absolute",
+                    bottom: 60,
+                    left: "50%",
+                    transform: [{ translateX: "-50%" }],
+                  }}
+                >
+                  {otpSpinner == true ? (
+                    <ActivityIndicator
+                      size={"small"}
+                      color={"#fff"}
+                      style={{ alignSelf: "center" }}
+                    />
+                  ) : (
+                    <Text
+                      style={{
+                        color: "#fff",
+                        fontWeight: "bold",
+                        textAlign: "center",
+                        fontSize: 16,
+                      }}
+                    >
+                      Verify
+                    </Text>
+                  )}
+                </TouchableOpacity>
+                <TouchableOpacity
+                  onPress={() => closeSheet()}
+                  style={{
+                    position: "absolute",
+                    bottom: 25,
+                    left: "50%",
+                    transform: [{ translateX: "-50%" }],
+                  }}
+                >
+                  <Text
+                    style={{
+                      fontWeight: "bold",
+                      textAlign: "center",
+                      color: "#838383",
+                      fontSize: 16,
+                    }}
+                  >
+                    Cancel
+                  </Text>
+                </TouchableOpacity>
+              </View>
+            </Animated.View>
+          </View>
+        </>
+      )}
+    </View>
+  );
 }
 
-
 const styles = StyleSheet.create({
-    container: {
-        padding: 20,
-        height: height,
-        width: width,
-        paddingTop: 100,
-        gap: 50
-    },
-    logoContainer: {
-        alignItems: 'center',
-        justifyContent: 'center',
-    },
-    logoCircle: {
-        width: 120,
-        height: 120,
-        borderRadius: 60,
-        backgroundColor: '#6B8E6F',
-        alignItems: 'center',
-        justifyContent: 'center',
-        borderWidth: 8,
-        borderColor: '#FFFFFF',
-        shadowColor: '#000',
-        shadowOffset: { width: 0, height: 4 },
-        shadowOpacity: 0.2,
-        shadowRadius: 8,
-        elevation: 8,
-    },
-    collegeText: {
-        color: '#FFFFFF',
-        fontSize: 13,
-        fontWeight: '600',
-        letterSpacing: 1.5,
-        textAlign: 'center',
-    },
-    locationText: {
-        color: '#FFFFFF',
-        fontSize: 11,
-        fontWeight: '400',
-        letterSpacing: 1,
-        marginTop: 4,
-        textAlign: 'center',
-    },
-    titleText: {
-        color: '#FFFFFF',
-        fontSize: 32,
-        fontWeight: 'bold',
-        letterSpacing: 2,
-        textAlign: 'center',
-    },
-    label: {
-        fontSize: 14,
-        color: '#FFFFFF',
-        fontWeight: '600',
-        marginBottom: 8,
-    },
-    input: {
-        backgroundColor: '#FFFFFF',
-        paddingVertical: 16,
-        paddingHorizontal: 20,
-        borderRadius: 30,
-        marginBottom: 5,
-        borderWidth: 0,
-        color: '#2C5F7B',
-        fontSize: 15,
-        shadowColor: '#000',
-        shadowOffset: { width: 0, height: 2 },
-        shadowOpacity: 0.1,
-        shadowRadius: 4,
-        elevation: 3,
-    },
-    passwordInput: {
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-        alignItems: 'center',
-        backgroundColor: '#FFFFFF',
-        paddingVertical: 16,
-        paddingLeft: 20,
-        borderRadius: 30,
-        marginBottom: 15,
-        borderWidth: 0,
-        shadowColor: '#000',
-        shadowOffset: { width: 0, height: 2 },
-        shadowOpacity: 0.1,
-        shadowRadius: 4,
-        elevation: 3,
-    },
-    button: {
-        width: '100%',
-        paddingVertical: 16,
-        borderRadius: 30,
-        alignItems: 'center',
-        marginTop: 20,
-        shadowColor: '#000',
-        shadowOffset: { width: 0, height: 4 },
-        shadowOpacity: 0.2,
-        shadowRadius: 6,
-        elevation: 6,
-    },
-    buttonText: {
-        color: '#FFFFFF',
-        fontWeight: 'bold',
-        fontSize: 16,
-        letterSpacing: 1.5,
-    },
-    inputFocused: {
-        borderColor: '#F5B840', 
-        borderWidth: 2,
-    },
-    footer: {
-        position: 'absolute',
-        bottom: 40,
-        alignItems: 'center',
-    },
-    footerText: {
-        color: '#FFFFFF',
-        fontSize: 11,
-        fontWeight: '500',
-        letterSpacing: 1,
-        opacity: 0.8,
-    },
+  container: {
+    padding: 20,
+    height: height,
+    width: width,
+    paddingTop: 100,
+    gap: 50,
+  },
+  logoContainer: {
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  logoCircle: {
+    width: 120,
+    height: 120,
+    borderRadius: 60,
+    backgroundColor: "#6B8E6F",
+    alignItems: "center",
+    justifyContent: "center",
+    borderWidth: 8,
+    borderColor: "#FFFFFF",
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.2,
+    shadowRadius: 8,
+    elevation: 8,
+  },
+  collegeText: {
+    color: "#FFFFFF",
+    fontSize: 13,
+    fontWeight: "600",
+    letterSpacing: 1.5,
+    textAlign: "center",
+  },
+  locationText: {
+    color: "#FFFFFF",
+    fontSize: 11,
+    fontWeight: "400",
+    letterSpacing: 1,
+    marginTop: 4,
+    textAlign: "center",
+  },
+  titleText: {
+    color: "#FFFFFF",
+    fontSize: 32,
+    fontWeight: "bold",
+    letterSpacing: 2,
+    textAlign: "center",
+  },
+  label: {
+    fontSize: 14,
+    color: "#FFFFFF",
+    fontWeight: "600",
+    marginBottom: 8,
+  },
+  input: {
+    backgroundColor: "#FFFFFF",
+    paddingVertical: 16,
+    paddingHorizontal: 20,
+    borderRadius: 30,
+    marginBottom: 5,
+    borderWidth: 0,
+    color: "#2C5F7B",
+    fontSize: 15,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3,
+  },
+  passwordInput: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    backgroundColor: "#FFFFFF",
+    paddingVertical: 16,
+    paddingLeft: 20,
+    borderRadius: 30,
+    marginBottom: 15,
+    borderWidth: 0,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3,
+  },
+  button: {
+    width: "100%",
+    paddingVertical: 16,
+    borderRadius: 30,
+    alignItems: "center",
+    marginTop: 20,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.2,
+    shadowRadius: 6,
+    elevation: 6,
+  },
+  buttonText: {
+    color: "#FFFFFF",
+    fontWeight: "bold",
+    fontSize: 16,
+    letterSpacing: 1.5,
+  },
+  inputFocused: {
+    borderColor: "#F5B840",
+    borderWidth: 2,
+  },
+  footer: {
+    position: "absolute",
+    bottom: 40,
+    alignItems: "center",
+  },
+  footerText: {
+    color: "#FFFFFF",
+    fontSize: 11,
+    fontWeight: "500",
+    letterSpacing: 1,
+    opacity: 0.8,
+  },
 });

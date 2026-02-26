@@ -1,64 +1,168 @@
-import { useLocalSearchParams } from "expo-router";
-import { StyleSheet, Text, View } from "react-native";
+import { MaterialCommunityIcons } from "@expo/vector-icons";
+import Ionicons from "@expo/vector-icons/Ionicons";
+import { useNavigation, useRoute } from "@react-navigation/native";
+import { Stack, router } from "expo-router";
+import {
+  Dimensions,
+  ScrollView,
+  Text,
+  TouchableOpacity,
+  View,
+} from "react-native";
+
+const { width } = Dimensions.get("screen");
 
 export default function BookDetail() {
-  const params = useLocalSearchParams();
-  const book = params.book ? JSON.parse(params.book as string) : null;
+  const navigation = useNavigation();
+  const route = useRoute();
 
-  if (!book) {
-    return <Text>No book data found.</Text>;
-  }
+  // Parse book and reservations from route params
+  const { book } = route.params as any;
+  const parsedBook = typeof book === "string" ? JSON.parse(book) : book;
 
-  // Extract reservation and user info
-  const reservation = book.reservation;
-  const user = reservation?.user;
+  const reservations = Array.isArray(parsedBook.reservation)
+    ? parsedBook.reservation
+    : [parsedBook.reservation];
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>{book.title}</Text>
-      <View style={styles.detailsBox}>
-        <Text style={styles.section}>Reservation Details:</Text>
-        {reservation && user ? (
-          <View>
-            <Text style={styles.label}>
-              Reserved by:
-              <Text style={styles.value}>
-                {" "}
-                {user.name} ({user.email})
+    <>
+      <Stack.Screen options={{ headerShown: false }} />
+
+      <View style={{ flex: 1, backgroundColor: "#f6f8fa" }}>
+        {/* Header */}
+        <View
+          style={{
+            width: "100%",
+            paddingTop: 40,
+            paddingBottom: 16,
+            paddingHorizontal: 20,
+            backgroundColor: "#16a2e5",
+            borderBottomLeftRadius: 18,
+            borderBottomRightRadius: 18,
+            flexDirection: "row",
+            alignItems: "center",
+            shadowColor: "#000",
+            shadowOpacity: 0.08,
+            shadowRadius: 6,
+            elevation: 4,
+          }}
+        >
+          <TouchableOpacity
+            onPress={() => navigation.goBack()}
+            style={{ marginRight: 12, padding: 4 }}
+          >
+            <Text style={{ color: "#fff", fontSize: 28, fontWeight: "bold" }}>
+              <Ionicons name="arrow-back-sharp" size={24} color="white" />
+            </Text>
+          </TouchableOpacity>
+
+          <Text style={{ color: "#fff", fontSize: 24, fontWeight: "700" }}>
+            Reservation Details
+          </Text>
+        </View>
+
+        <ScrollView
+          contentContainerStyle={{
+            padding: 20,
+            paddingBottom: 120,
+          }}
+        >
+          {/* Book Title */}
+          <Text
+            style={{
+              fontSize: 32,
+              fontWeight: "bold",
+              color: "#111",
+              marginBottom: 18,
+            }}
+          >
+            {parsedBook.title}
+          </Text>
+
+          {/* Reservation Cards */}
+          {reservations.map((res: any, idx: number) => (
+            <View
+              key={idx}
+              style={{
+                backgroundColor: "#16a2e5",
+                borderRadius: 24,
+                padding: 22,
+                marginBottom: 22,
+                shadowColor: "#000",
+                shadowOpacity: 0.07,
+                shadowRadius: 6,
+                elevation: 2,
+              }}
+            >
+              <Text style={{ color: "#fff", fontWeight: "bold", fontSize: 16 }}>
+                Reserved by:{" "}
+                <Text style={{ fontWeight: "normal" }}>
+                  {res?.user?.name || "N/A"}
+                </Text>
               </Text>
+
+              <Text style={{ color: "#fff", marginBottom: 6 }}>
+                Email: {res?.user?.email || "N/A"}
+              </Text>
+
+              <Text style={{ color: "#fff", fontWeight: "bold", fontSize: 16 }}>
+                Status:{" "}
+                <Text style={{ fontWeight: "normal" }}>
+                  {res?.status || "Unknown"}
+                </Text>
+              </Text>
+
+              <Text style={{ color: "#fff", fontWeight: "bold", fontSize: 16 }}>
+                Reserved at:
+              </Text>
+
+              <Text style={{ color: "#fff" }}>
+                {res?.created_at || "Unknown"}
+              </Text>
+            </View>
+          ))}
+
+          {/* Footer */}
+          <View style={{ alignItems: "center", marginTop: 10 }}>
+            <Text
+              style={{
+                color: "#b0b8c1",
+                fontWeight: "600",
+                fontSize: 17,
+                marginBottom: 2,
+              }}
+            >
+              MLG College of Learning, Inc.
             </Text>
-            <Text style={styles.label}>
-              Status:
-              <Text style={styles.value}> {reservation.status}</Text>
-            </Text>
-            <Text style={styles.label}>
-              Reserved at:
-              <Text style={styles.value}> {reservation.created_at}</Text>
+            <Text style={{ color: "#b0b8c1", fontSize: 15 }}>
+              Library Management System
             </Text>
           </View>
-        ) : (
-          <Text style={styles.empty}>No reservation details.</Text>
-        )}
+        </ScrollView>
+
+        {/* Floating QR Button */}
+        <TouchableOpacity
+          onPress={() => router.push("/borrow")}
+          style={{
+            position: "absolute",
+            bottom: 28,
+            right: 24,
+            backgroundColor: "#16a2e5",
+            borderRadius: 32,
+            width: 64,
+            height: 64,
+            alignItems: "center",
+            justifyContent: "center",
+            shadowColor: "#000",
+            shadowOpacity: 0.13,
+            shadowRadius: 8,
+            elevation: 6,
+          }}
+          activeOpacity={0.8}
+        >
+          <MaterialCommunityIcons name="qrcode-scan" size={32} color="#fff" />
+        </TouchableOpacity>
       </View>
-    </View>
+    </>
   );
 }
-
-const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: "#f4f6f8", padding: 24 },
-  title: { fontSize: 24, fontWeight: "bold", marginBottom: 24 },
-  detailsBox: {
-    backgroundColor: "#fff",
-    borderRadius: 12,
-    padding: 18,
-    shadowColor: "#000",
-    shadowOpacity: 0.07,
-    shadowRadius: 6,
-    elevation: 2,
-    marginBottom: 24,
-  },
-  section: { fontSize: 18, fontWeight: "bold", marginBottom: 12 },
-  label: { fontSize: 16, fontWeight: "600", marginBottom: 6, color: "#374151" },
-  value: { fontWeight: "400", color: "#2563eb" },
-  empty: { fontSize: 16, color: "#888" },
-});
