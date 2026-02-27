@@ -1,13 +1,14 @@
+import { Login } from '@/api/login';
 import { OTPValidation } from '@/api/OtpValidation';
 import { Ionicons } from '@expo/vector-icons';
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { LinearGradient } from 'expo-linear-gradient';
 import { useRouter } from 'expo-router';
 import { useEffect, useRef, useState } from 'react';
-import { ActivityIndicator, Alert, Animated, Dimensions, Image, Keyboard, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import { ActivityIndicator, Alert, Animated, Dimensions, Image, Keyboard, KeyboardAvoidingView, Platform, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import { OtpInput } from 'react-native-otp-entry';
 
-const logo = require('../assets/images/logo-name.png');
+const logo = require('../assets/images/logo.png');
 const { height, width } = Dimensions.get('screen');
 
 
@@ -119,6 +120,7 @@ export default function Index() {
         }
 
         try {
+            console.log(email.trim(), password.trim(), randString)
             const response = await Login(email.trim(), password.trim(), randString);
 
             if(!response.error) {
@@ -165,7 +167,7 @@ export default function Index() {
     }
 
     return (
-        <View style={{ flex: 1 }}>
+        <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === 'ios' ? 'padding' : 'height'} >
             {screenLoading == true ? (
                 <View style={{ justifyContent: 'center', height }}>
                     <ActivityIndicator color={'#3498db'} size={'large'} />
@@ -178,121 +180,119 @@ export default function Index() {
                         end={{ x: 0.5, y: 1 }}
                         style={{ height, position: 'absolute', width, top: 0, zIndex: 1 }}
                     />
-                    <View style={{paddingTop: 120, alignItems: 'center', height, zIndex: 10, paddingHorizontal: 30 }}>
-                        <View style={styles.logoContainer}>
-                            <View style={styles.logoCircle}>
-                                <Image source={logo} style={{ height: 40, width: 40, tintColor: '#fff' }} resizeMode="contain" />
+                    <ScrollView style={{ flex: 1, zIndex: 10, }}>
+                        <View style={{paddingTop: 120, alignItems: 'center', paddingHorizontal: 30 }}>
+                            <View style={styles.logoContainer}>
+                                <View>
+                                    <Image source={logo} style={{ height: 60, width: 60 }} resizeMode="contain" />
+                                </View>
                             </View>
-                        </View>
 
-                        <View style={{ alignItems: 'center', marginTop: 30, marginBottom: 10 }}>
-                            <Text style={styles.collegeText}>MLG COLLEGE OF LEARNING, INC.</Text>
-                            <Text style={styles.locationText}>BRGY. ATABAY, HILONGOS, LEYTE</Text>
-                        </View>
-
-                        <View style={{ flexDirection: 'column', alignItems: 'center', width: '100%', marginTop: 20 }}>
-                            <Text style={styles.titleText}>MLGCL LIBRARY</Text>
-                            
-                            <View style={{ width: '100%', marginTop: 40 }}>
-                                <Text style={styles.label}>Email</Text>
-                                <TextInput
-                                    placeholder="Enter your email"
-                                    placeholderTextColor="#A8CBDB"
-                                    value={email}
-                                    onChangeText={setEmail}
-                                    keyboardType="email-address"
-                                    autoCapitalize="none"
-                                    onFocus={() => setEmailFocused(true)}
-                                    onBlur={() => setEmailFocused(false)}
-                                    style={[styles.input, emailFocused && styles.inputFocused]}
-                                />
+                            <View style={{ alignItems: 'center', marginTop: 10, marginBottom: 10 }}>
+                                <Text style={styles.collegeText}>MLG COLLEGE OF LEARNING, INC.</Text>
+                                <Text style={styles.locationText}>BRGY. ATABAY, HILONGOS, LEYTE</Text>
                             </View>
-                            <View style={{ width: '100%', marginTop: 20 }}>
-                                <Text style={styles.label}>Password</Text>
-                                <View style={[styles.passwordInput, passwordFocused && styles.inputFocused]}>
+
+                            <View style={{ flexDirection: 'column', alignItems: 'center', width: '100%', marginTop: 20 }}>
+                                <Text style={styles.titleText}>MLGCL LIBRARY</Text>
+                                
+                                <View style={{ width: '100%', marginTop: 40 }}>
+                                    <Text style={styles.label}>Email</Text>
                                     <TextInput
-                                        placeholder="Enter your password"
+                                        placeholder="Enter your email"
                                         placeholderTextColor="#A8CBDB"
-                                        value={password}
-                                        onChangeText={setPassword}
+                                        value={email}
+                                        onChangeText={(text) => setEmail(text)}
+                                        keyboardType="email-address"
                                         autoCapitalize="none"
-                                        secureTextEntry={!isPasswordVisible}
-                                        onFocus={() => setPasswordFocused(true)}
-                                        onBlur={() => setPasswordFocused(false)}
-                                        style={{ flex: 1, color: '#2C5F7B', fontSize: 15 }}
+                                        onFocus={() => setEmailFocused(true)}
+                                        onBlur={() => setEmailFocused(false)}
+                                        style={[styles.input, emailFocused && styles.inputFocused]}
                                     />
-                                    <TouchableOpacity onPress={() => setIsPasswordVisible(!isPasswordVisible)} style={{ paddingHorizontal: 15 }}>
-                                        {isPasswordVisible == true ? (
-                                            <Ionicons name="lock-open" color={'#7DB8D1'} size={22} />
-                                        ) : (
-                                            <Ionicons name="lock-closed" color={'#7DB8D1'} size={22} />
-                                        )}
-                                    </TouchableOpacity>
                                 </View>
-                            </View>
-                            
-                            <TouchableOpacity 
-                                disabled={loginSpinner} 
-                                onPress={() => handleLogin()} 
-                                style={[styles.button, {backgroundColor: loginSpinner == true ? '#F5C557' : '#F5B840'}]} 
-                            >
-                                {loginSpinner == true ? (
-                                    <ActivityIndicator size={'small'} color={'#fff'} style={{ alignSelf: 'center' }} />
-                                ) : (
-                                    <Text style={styles.buttonText}>LOGIN</Text>
-                                )}
-                            </TouchableOpacity>
-                        </View>
-
-                        <View style={styles.footer}>
-                            <Text style={styles.footerText}>LIBRARY SCANNER APP V1.0</Text>
-                        </View>
-
-                        {overlay == true && (
-                        <Animated.View style={{ backgroundColor: '#00000065', width: width, height: height, opacity: fadeInAnim, position: 'absolute' }} />
-                        )}
-                        <Animated.View style={{ position: 'absolute', bottom: 0, width: width, height: height - 280, transform: [{ translateY: translateY }], backgroundColor: '#FAFAFA', borderTopLeftRadius: 30, borderTopRightRadius: 30, zIndex: 5, paddingHorizontal: 25, paddingTop: 30 }}>
-                            <View>
-                                <Text style={{ fontSize: 18, fontWeight: 'bold' }}>Enter 6 Digits Code</Text>
-                                <Text style={{ fontSize: 13, marginTop: 25, color: '#545454' }}>Please enter verification code sent to your registered mlgcl email.</Text>
-                                <View style={{ marginTop: 20 }}>
-                                    <OtpInput numberOfDigits={6} focusColor={'#3498db'} autoFocus={false} onTextChange={(text) => {
-                                        setOtpCode(text);
-                                        if(text.length == 6) {
-                                            Keyboard.dismiss();
-                                        }
-                                    }} />
+                                <View style={{ width: '100%' }}>
+                                    <Text style={styles.label}>Password</Text>
+                                    <View style={[styles.passwordInput, passwordFocused && styles.inputFocused]}>
+                                        <TextInput
+                                            placeholder="Enter your password"
+                                            placeholderTextColor="#A8CBDB"
+                                            value={password}
+                                            onChangeText={(text) => setPassword(text)}
+                                            autoCapitalize="none"
+                                            secureTextEntry={!isPasswordVisible}
+                                            onFocus={() => setPasswordFocused(true)}
+                                            onBlur={() => setPasswordFocused(false)}
+                                            style={{ flex: 1, color: '#2C5F7B', fontSize: 15 }}
+                                        />
+                                        <TouchableOpacity onPress={() => setIsPasswordVisible(!isPasswordVisible)} style={{ paddingHorizontal: 15 }}>
+                                            {isPasswordVisible == true ? (
+                                                <Ionicons name="lock-open" color={'#7DB8D1'} size={22} />
+                                            ) : (
+                                                <Ionicons name="lock-closed" color={'#7DB8D1'} size={22} />
+                                            )}
+                                        </TouchableOpacity>
+                                    </View>
                                 </View>
-                                <View style={{ flexDirection: 'row', alignSelf: 'center', marginTop: 10 }}>
-                                    <Text style={{ fontSize: 12, color: '#545454' }}>Didn't receive a code? </Text>
-                                    <TouchableOpacity onPress={() => handleResendOtp()}  disabled={isActive} >
-                                        <Text style={{ fontSize: 12, textDecorationLine: 'underline', color: isActive == true ? '#78bdebff' : '#3498db' }}>Resend code</Text>
-                                    </TouchableOpacity>
-                                    {isActive && (
-                                    <>
-                                        <Text>{` (${timeLeft})`}</Text>
-                                    </>
-                                    )}
-                                </View>
-                            </View>
-                            <View style={{ flex: 1, position: 'relative' }}>
-                                <TouchableOpacity onPress={() => handleOTPValidation()} disabled={otpSpinner} style={{ backgroundColor: otpSpinner == true ? '#5faee2ff' : '#3498db', width: width - 20,
-                                    borderRadius: 30, paddingVertical: 12, position: 'absolute', bottom: 60, left: '50%', transform: [{ translateX: '-50%' }] }}>
-                                    {otpSpinner == true ? (
+                                
+                                <TouchableOpacity 
+                                    disabled={loginSpinner} 
+                                    onPress={() => handleLogin()} 
+                                    style={[styles.button, {backgroundColor: loginSpinner == true ? '#F5C557' : '#F5B840'}]} 
+                                >
+                                    {loginSpinner == true ? (
                                         <ActivityIndicator size={'small'} color={'#fff'} style={{ alignSelf: 'center' }} />
                                     ) : (
-                                        <Text style={{ color: '#fff', fontWeight: 'bold', textAlign: 'center', fontSize: 16 }}>Verify</Text>
+                                        <Text style={styles.buttonText}>LOGIN</Text>
                                     )}
                                 </TouchableOpacity>
-                                <TouchableOpacity onPress={() => closeSheet()} style={{ position: 'absolute', bottom: 25, left: '50%', transform: [{ translateX: '-50%' }] }}>
-                                    <Text style={{ fontWeight: 'bold', textAlign: 'center', color: '#838383', fontSize: 16 }}>Cancel</Text>
-                                </TouchableOpacity>
                             </View>
-                        </Animated.View>
+
+                            <Animated.View style={{ flexDirection: 'column', alignItems: 'center',justifyContent: 'space-between', position: 'absolute', bottom: -140, width: width - 30, height: 400, transform: [{ translateY: translateY }], backgroundColor: '#FAFAFA', borderRadius: 30, zIndex: 5, paddingHorizontal: 25, paddingVertical: 35 }}>
+                                <View>
+                                    <Text style={{ fontSize: 24, fontWeight: '900' }}>Enter 6 Digits Code</Text>
+                                    <Text style={{ fontSize: 13, marginTop: 20, color: '#545454' }}>Please enter verification code sent to your registered mlgcl email.</Text>
+                                    <View style={{ marginTop: 20 }}>
+                                        <OtpInput numberOfDigits={6} focusColor={'#3498db'} autoFocus={false} onTextChange={(text) => {
+                                            setOtpCode(text);
+                                            if(text.length == 6) {
+                                                Keyboard.dismiss();
+                                            }
+                                        }} />
+                                    </View>
+                                    <View style={{ flexDirection: 'row', alignSelf: 'center', marginTop: 20 }}>
+                                        <Text style={{ fontSize: 12, color: '#545454' }}>Didn't receive a code? </Text>
+                                        <TouchableOpacity onPress={() => handleResendOtp()}  disabled={isActive} >
+                                            <Text style={{ fontSize: 12, fontWeight: '700', color: isActive == true ? '#78bdebff' : '#3498db' }}>Resend code</Text>
+                                        </TouchableOpacity>
+                                        {isActive && (
+                                        <>
+                                            <Text>{` (${timeLeft})`}</Text>
+                                        </>
+                                        )}
+                                    </View>
+                                </View>
+                                <View style={{ position: 'relative', width: '100%', alignItems: 'center', gap: 15 }}>
+                                    <TouchableOpacity onPress={() => handleOTPValidation()} disabled={otpSpinner} style={{ backgroundColor: otpSpinner == true ? '#5faee2ff' : '#3498db', width: '100%',
+                                        borderRadius: 10, paddingVertical: 14 }}>
+                                        {otpSpinner == true ? (
+                                            <ActivityIndicator size={'small'} color={'#fff'} style={{ alignSelf: 'center' }} />
+                                        ) : (
+                                            <Text style={{ color: '#fff', fontWeight: 'bold', textAlign: 'center', fontSize: 16 }}>Verify</Text>
+                                        )}
+                                    </TouchableOpacity>
+                                    <TouchableOpacity onPress={() => closeSheet()} >
+                                        <Text style={{ fontWeight: 'bold', textAlign: 'center', color: '#838383', fontSize: 16 }}>Cancel</Text>
+                                    </TouchableOpacity>
+                                </View>
+                            </Animated.View>
+                        </View>
+                    </ScrollView>
+                    <View style={styles.footer}>
+                        <Text style={styles.footerText}>@CreativeDevLabs</Text>
                     </View>
                 </>
             )}
-        </View>
+        </KeyboardAvoidingView>
     )
 }
 
@@ -309,25 +309,10 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         justifyContent: 'center',
     },
-    logoCircle: {
-        width: 120,
-        height: 120,
-        borderRadius: 60,
-        backgroundColor: '#6B8E6F',
-        alignItems: 'center',
-        justifyContent: 'center',
-        borderWidth: 8,
-        borderColor: '#FFFFFF',
-        shadowColor: '#000',
-        shadowOffset: { width: 0, height: 4 },
-        shadowOpacity: 0.2,
-        shadowRadius: 8,
-        elevation: 8,
-    },
     collegeText: {
         color: '#FFFFFF',
         fontSize: 13,
-        fontWeight: '600',
+        fontWeight: '700',
         letterSpacing: 1.5,
         textAlign: 'center',
     },
@@ -341,9 +326,9 @@ const styles = StyleSheet.create({
     },
     titleText: {
         color: '#FFFFFF',
-        fontSize: 32,
+        fontSize: 28,
         fontWeight: 'bold',
-        letterSpacing: 2,
+        letterSpacing: 1,
         textAlign: 'center',
     },
     label: {
@@ -356,7 +341,7 @@ const styles = StyleSheet.create({
         backgroundColor: '#FFFFFF',
         paddingVertical: 16,
         paddingHorizontal: 20,
-        borderRadius: 30,
+        borderRadius: 10,
         marginBottom: 5,
         borderWidth: 0,
         color: '#2C5F7B',
@@ -372,9 +357,9 @@ const styles = StyleSheet.create({
         justifyContent: 'space-between',
         alignItems: 'center',
         backgroundColor: '#FFFFFF',
-        paddingVertical: 16,
+        paddingVertical: 8,
         paddingLeft: 20,
-        borderRadius: 30,
+        borderRadius: 10,
         marginBottom: 15,
         borderWidth: 0,
         shadowColor: '#000',
@@ -386,9 +371,9 @@ const styles = StyleSheet.create({
     button: {
         width: '100%',
         paddingVertical: 16,
-        borderRadius: 30,
+        borderRadius: 10,
         alignItems: 'center',
-        marginTop: 20,
+        marginTop: 30,
         shadowColor: '#000',
         shadowOffset: { width: 0, height: 4 },
         shadowOpacity: 0.2,
@@ -407,8 +392,11 @@ const styles = StyleSheet.create({
     },
     footer: {
         position: 'absolute',
+        left: '50%',
+        transform: [{ translateX: '-50%' }],
         bottom: 40,
         alignItems: 'center',
+        zIndex: 10
     },
     footerText: {
         color: '#FFFFFF',
