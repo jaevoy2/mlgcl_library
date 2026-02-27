@@ -1,24 +1,26 @@
+import { fetchReservationRecords } from "@/api/FetchReservationRecord";
+import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { useRouter } from "expo-router";
 import { useEffect, useState } from "react";
 import {
-    Dimensions,
-    RefreshControl,
-    ScrollView,
-    Text,
-    TextInput,
-    TouchableOpacity,
-    View,
+  ActivityIndicator,
+  Dimensions,
+  RefreshControl,
+  ScrollView,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
 } from "react-native";
-import { fetchReservationRecords } from "../../api/FetchReservationRecord";
 
 type Book = {
   id: string | number;
   title: string;
   reserved: number;
   available: number | null;
-  reservation: unknown; // Pass the whole reservation object
+  reservation: unknown;
 };
 
 type RootStackParamList = {
@@ -35,9 +37,11 @@ export default function ReservationView() {
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
   const navigation = useNavigation<NavigationProp>();
   const router = useRouter();
 
+  // Fetch reservation data
   const fetchData = async () => {
     try {
       setLoading(true);
@@ -45,31 +49,29 @@ export default function ReservationView() {
       const timeout = setTimeout(() => {
         setError("Request timed out. Please try again.");
         setLoading(false);
-      }, 10000); // 10 seconds
+      }, 10000);
 
       const data = await fetchReservationRecords();
       clearTimeout(timeout);
 
-      // Map API reservation objects to Book type
       if (Array.isArray(data)) {
         const mappedBooks = data.map((reservation) => {
           const book = reservation.book_copy?.book || {};
-          // Use available if it's a number, otherwise null
           const available =
             typeof book.available === "number" ? book.available : null;
           return {
             id: book.id || reservation.id,
             title: book.title || "Untitled",
-            reserved: 1, // Each reservation is for 1 copy
+            reserved: 1,
             available,
-            reservation, // Pass the whole reservation object
+            reservation,
           };
         });
         setBooks(mappedBooks);
       } else {
         setBooks([]);
       }
-    } catch (err: any) {
+    } catch {
       setError("Failed to fetch reservations.");
       setBooks([]);
     } finally {
@@ -98,18 +100,91 @@ export default function ReservationView() {
     });
   };
 
+  // Render a single reservation card
+  const renderBookCard = (book: Book, idx: number) => (
+    <View
+      key={`${book.id}-${idx}`}
+      style={{
+        backgroundColor: "#fff",
+        borderRadius: 18,
+        padding: width > 600 ? 24 : 18,
+        marginBottom: 18,
+        shadowColor: "#000",
+        shadowOpacity: 0.07,
+        shadowRadius: 6,
+        elevation: 2,
+        width: width > 600 ? 500 : "100%",
+        alignSelf: "center",
+        minHeight: 110,
+        justifyContent: "center",
+      }}
+    >
+      <Text
+        style={{
+          fontSize: width > 600 ? 19 : 17,
+          fontWeight: "700",
+          color: "#222b45",
+          marginBottom: 8,
+          flexWrap: "wrap",
+        }}
+        numberOfLines={2}
+        ellipsizeMode="tail"
+      >
+        {book.title}
+      </Text>
+      <View
+        style={{
+          flexDirection: "row",
+          justifyContent: "space-between",
+          marginBottom: 10,
+        }}
+      >
+        <View>
+          <Text style={{ color: "#6b7280", fontSize: 13 }}>Reserved</Text>
+          <Text style={{ color: "#ff9800", fontWeight: "bold", fontSize: 18 }}>
+            {book.reserved}
+          </Text>
+        </View>
+        <View style={{ alignItems: "flex-end" }}>
+          <Text style={{ color: "#6b7280", fontSize: 13 }}>Available</Text>
+          <Text style={{ color: "#22b573", fontWeight: "bold", fontSize: 18 }}>
+            {book.available !== null ? book.available : "Unknown"}
+          </Text>
+        </View>
+      </View>
+      <TouchableOpacity
+        style={{
+          backgroundColor: "#2196f3",
+          borderRadius: 10,
+          paddingVertical: 12,
+          alignItems: "center",
+        }}
+        onPress={() => handleSeeDetails(book)}
+        activeOpacity={0.85}
+      >
+        <Text style={{ color: "#fff", fontWeight: "600", fontSize: 17 }}>
+          See Details
+        </Text>
+      </TouchableOpacity>
+    </View>
+  );
+
   return (
-    <View style={{ flex: 1, backgroundColor: "#eef2f7" }}>
+    <View style={{ flex: 1, backgroundColor: "#f6f8fa" }}>
       {/* Header */}
       <View
         style={{
           width: "100%",
-          paddingTop: 48,
-          paddingBottom: 20,
+          paddingTop: 40,
+          paddingBottom: 16,
           paddingHorizontal: 20,
-          backgroundColor: "#3498db",
+          backgroundColor: "#2196f3",
+          borderBottomLeftRadius: 18,
+          borderBottomRightRadius: 18,
+          flexDirection: "row",
+          alignItems: "center",
           shadowColor: "#000",
-          shadowOpacity: 0.1,
+          shadowOpacity: 0.08,
           shadowRadius: 6,
           elevation: 4,
         }}
@@ -119,42 +194,52 @@ export default function ReservationView() {
         </Text>
       </View>
 
+      {/* Search Bar */}
+      <View style={{ padding: 16, paddingBottom: 0 }}>
+        <TextInput
+          placeholder="Search reservation"
+          value={search}
+          onChangeText={setSearch}
+          placeholderTextColor="#b0b8c1"
+          style={{
+            backgroundColor: "#fff",
+            borderRadius: 14,
+            paddingHorizontal: 18,
+            paddingVertical: 13,
+            fontSize: 16,
+            shadowColor: "#000",
+            shadowOpacity: 0.07,
+            shadowRadius: 5,
+            elevation: 2,
+            marginBottom: 12,
+            borderWidth: 0,
+          }}
+        />
+      </View>
+
+      {/* Reservation List */}
       <ScrollView
-        style={{ paddingHorizontal: 20 }}
-        contentContainerStyle={{ padding: 20 }}
+        contentContainerStyle={{
+          padding: 16,
+          paddingTop: 0,
+          paddingBottom: 100,
+        }}
         refreshControl={
           <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
         }
+        keyboardShouldPersistTaps="handled"
       >
-        {/* Search */}
-        <TextInput
-          placeholder="Search  reservation"
-          value={search}
-          onChangeText={setSearch}
-          style={{
-            backgroundColor: "#fff",
-            borderRadius: 5,
-            paddingHorizontal: 16,
-            paddingVertical: 12,
-            fontSize: 15,
-            shadowColor: "#000",
-            shadowOpacity: 0.06,
-            shadowRadius: 5,
-            elevation: 2,
-            marginBottom: 20,
-          }}
-        />
-
         {error && (
           <Text style={{ color: "red", textAlign: "center", marginBottom: 16 }}>
             {error}
           </Text>
         )}
-
-
-        {/* Cards */}
         {loading ? (
-          <Text style={{ textAlign: "center", marginTop: 30 }}>Loading...</Text>
+          <ActivityIndicator
+            color="#2196f3"
+            size="large"
+            style={{ marginTop: 30 }}
+          />
         ) : filteredBooks.length === 0 ? (
           <Text
             style={{ color: "#6b7280", textAlign: "center", marginTop: 30 }}
@@ -162,95 +247,32 @@ export default function ReservationView() {
             No books found
           </Text>
         ) : (
-          filteredBooks.map((book, index) => (
-            <View
-              key={`${book.id}-${index}`}
-              style={{
-                backgroundColor: "#fff",
-                borderRadius: 16,
-                padding: width > 600 ? 24 : 12,
-                marginBottom: 12,
-                shadowColor: "#000",
-                shadowOpacity: 0.05,
-                shadowRadius: 6,
-                elevation: 2,
-                width: "100%",
-                alignSelf: "center",
-                minHeight: 120,
-                justifyContent: "center",
-              }}
-            >
-              <Text
-                style={{
-                  fontSize: width > 600 ? 20 : 16,
-                  fontWeight: "600",
-                  color: "#111827",
-                  marginBottom: 10,
-                  flexWrap: "wrap",
-                }}
-                numberOfLines={2}
-                ellipsizeMode="tail"
-              >
-                {book.title}
-              </Text>
-
-              {/* Status Row */}
-              <View
-                style={{
-                  flexDirection: "row",
-                  justifyContent: "space-between",
-                  marginBottom: 12,
-                }}
-              >
-                <View>
-                  <Text style={{ color: "#6b7280", fontSize: 12 }}>
-                    Reserved
-                  </Text>
-                  <Text
-                    style={{
-                      color: "#f59e0b",
-                      fontWeight: "700",
-                      fontSize: 16,
-                    }}
-                  >
-                    {book.reserved}
-                  </Text>
-                </View>
-                <View>
-                  <Text style={{ color: "#6b7280", fontSize: 12 }}>
-                    Available
-                  </Text>
-                  <Text
-                    style={{
-                      color: "#16a34a",
-                      fontWeight: "700",
-                      fontSize: 16,
-                    }}
-                  >
-                    {book.available !== null && book.available !== undefined
-                      ? book.available
-                      : "Unknown"}
-                  </Text>
-                </View>
-              </View>
-
-              <TouchableOpacity
-                onPress={() => handleSeeDetails(book)}
-                style={{
-                  backgroundColor: "#3498db",
-                  borderRadius: 10,
-                  paddingVertical: 10,
-                  alignItems: "center",
-                }}
-              >
-                <Text style={{ color: "#fff", fontWeight: "600" }}>
-                  See Details
-                </Text>
-              </TouchableOpacity>
-            </View>
-          ))
+          filteredBooks.map(renderBookCard)
         )}
       </ScrollView>
+
+      {/* Floating QR Button */}
+      <TouchableOpacity
+        onPress={() => router.push("/borrow")}
+        style={{
+          position: "absolute",
+          bottom: 28,
+          right: 24,
+          backgroundColor: "#2196f3",
+          borderRadius: 32,
+          width: 56,
+          height: 56,
+          alignItems: "center",
+          justifyContent: "center",
+          shadowColor: "#000",
+          shadowOpacity: 0.13,
+          shadowRadius: 8,
+          elevation: 6,
+        }}
+        activeOpacity={0.8}
+      >
+        <MaterialCommunityIcons name="qrcode-scan" size={28} color="#fff" />
+      </TouchableOpacity>
     </View>
   );
 }

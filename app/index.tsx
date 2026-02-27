@@ -13,158 +13,158 @@ const { height, width } = Dimensions.get('screen');
 
 
 export default function Index() {
-    const [screenLoading, setScreenLoading] = useState(true);
-    const [email, setEmail] = useState('');
-    const [password, setPassword] = useState('');
-    const [isPasswordVisible, setIsPasswordVisible] = useState(false);
-    const [emailFocused, setEmailFocused] = useState(false);
-    const [passwordFocused, setPasswordFocused] = useState(false);
-    const [loginSpinner, setLoginSpinner] = useState(false);
-    const [sessionId, setSessionId] = useState('');
-    const [otpSpinner, setOtpSpinner] = useState(false);
-    const [otpCode, setOtpCode] = useState('');
-    const [isActive, setIsActive] = useState(false)
-    const [timeLeft, setTimeLeft] = useState(120);
-    const [overlay, setOverlay] = useState(false);
-    const translateY = useRef(new Animated.Value(height)).current;
-    const fadeInAnim = useRef(new Animated.Value(0)).current;
-    const router = useRouter();
+  const [screenLoading, setScreenLoading] = useState(true);
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [isPasswordVisible, setIsPasswordVisible] = useState(false);
+  const [emailFocused, setEmailFocused] = useState(false);
+  const [passwordFocused, setPasswordFocused] = useState(false);
+  const [loginSpinner, setLoginSpinner] = useState(false);
+  const [sessionId, setSessionId] = useState("");
+  const [otpSpinner, setOtpSpinner] = useState(false);
+  const [otpCode, setOtpCode] = useState("");
+  const [isActive, setIsActive] = useState(false);
+  const [timeLeft, setTimeLeft] = useState(120);
+  const [overlay, setOverlay] = useState(false);
+  const translateY = useRef(new Animated.Value(height)).current;
+  const fadeInAnim = useRef(new Animated.Value(0)).current;
+  const router = useRouter();
 
-    useEffect(() => {
-        const checkToken = async function getToken() {
-            const token = await AsyncStorage.getItem('device_token');
+  useEffect(() => {
+    const checkToken = async function getToken() {
+      const token = await AsyncStorage.getItem("device_token");
 
-            setTimeout(() => {
-                if(token) {
-                    router.push('/dashboard')
-                }
-                setScreenLoading(false);
-            }, 600)
+      setTimeout(() => {
+        if (token) {
+          router.push("/dashboard");
         }
+        setScreenLoading(false);
+      }, 600);
+    };
 
-        checkToken();
-    }, [])
+    checkToken();
+  }, []);
 
-    useEffect(() => {
-        let timer: ReturnType<typeof setInterval>
+  useEffect(() => {
+    let timer: ReturnType<typeof setInterval>;
 
-        if(isActive) {
-            if(timeLeft > 0) {
-                timer = setInterval(() => {
-                    setTimeLeft((prev) => prev - 1  )
-                }, 1000);
-            }else if(timeLeft == 0) {
-                setIsActive(false);
-            }
-        }
-
-        return () => clearInterval(timer);
-    }, [isActive, timeLeft])
-
-    const resetTimer = () => {
-        setTimeLeft(120);
-        setIsActive(true);
+    if (isActive) {
+      if (timeLeft > 0) {
+        timer = setInterval(() => {
+          setTimeLeft((prev) => prev - 1);
+        }, 1000);
+      } else if (timeLeft == 0) {
+        setIsActive(false);
+      }
     }
 
-    const toggleSheet = () => {
-        setOverlay(true);
-        
-        fadeIn()
-        setIsActive(true);
-        Animated.timing(translateY, {
-        toValue: 0,
-        useNativeDriver: true,
-        }).start();
+    return () => clearInterval(timer);
+  }, [isActive, timeLeft]);
+
+  const resetTimer = () => {
+    setTimeLeft(120);
+    setIsActive(true);
+  };
+
+  const toggleSheet = () => {
+    setOverlay(true);
+
+    fadeIn();
+    setIsActive(true);
+    Animated.timing(translateY, {
+      toValue: 0,
+      useNativeDriver: true,
+    }).start();
+  };
+
+  const fadeIn = () => {
+    Animated.timing(fadeInAnim, {
+      toValue: 1,
+      duration: 500,
+      useNativeDriver: true,
+    }).start();
+  };
+
+  const closeSheet = () => {
+    fadeClose();
+    setOverlay(false);
+
+    Animated.timing(translateY, {
+      toValue: height,
+      useNativeDriver: true,
+    }).start();
+  };
+
+  const fadeClose = () => {
+    Animated.timing(fadeInAnim, {
+      toValue: 1,
+      duration: 500,
+      useNativeDriver: true,
+    }).start();
+  };
+
+  const handleLogin = async () => {
+    if (!email.trim() || !password.trim()) {
+      Alert.alert("Invalid", "Email and password are required.");
+
+      return;
     }
 
-    const fadeIn = () => {
-        Animated.timing(fadeInAnim, {
-        toValue: 1,
-        duration: 500,
-        useNativeDriver: true,
-        }).start();
+    setLoginSpinner(true);
+
+    const chars =
+      "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+    let randString = "";
+
+    for (let i = 0; i < 5; i++) {
+      randString += chars.charAt(Math.floor(Math.random() * chars.length));
     }
-
-    const closeSheet = () => {
-        fadeClose();
-        setOverlay(false);
-        
-        Animated.timing(translateY, {
-        toValue: height,
-        useNativeDriver: true,
-        }).start();
-    }
-
-    const fadeClose = () => {
-        Animated.timing(fadeInAnim, {
-        toValue: 1,
-        duration: 500,
-        useNativeDriver: true,
-        }).start();
-    }
-
-    const handleLogin = async () => {
-        if(!email.trim() || !password.trim()) {
-            Alert.alert('Invalid', 'Email and password are required.');
-            
-            return;
-        }
-
-        setLoginSpinner(true);
-
-        const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-        let randString = '';
-
-        for (let i = 0; i < 5; i++) {
-            randString += chars.charAt(Math.floor(Math.random() * chars.length));
-        }
 
         try {
             console.log(email.trim(), password.trim(), randString)
             const response = await Login(email.trim(), password.trim(), randString);
 
-            if(!response.error) {
-                toggleSheet();
-                setSessionId(response.session_id);
-                await AsyncStorage.setItem('session_id', response.session_id);
-            }else {
-                Alert.alert('Invalid', 'Invalid credentials. Please try again.');
-            }
+      if (!response.error) {
+        toggleSheet();
+        setSessionId(response.session_id);
+        await AsyncStorage.setItem("session_id", response.session_id);
+      } else {
+        Alert.alert("Invalid", "Invalid credentials. Please try again.");
+      }
+    } catch (error: any) {
+      Alert.alert("Error", error.message);
+    } finally {
+      setLoginSpinner(false);
+    }
+  };
 
-        }catch(error: any) {
-            Alert.alert('Error', error.message)
-        }finally {
-            setLoginSpinner(false)
-        }
+  const handleOTPValidation = async () => {
+    if (!otpCode.trim()) {
+      Alert.alert("Invalid", "OTP code is required.");
+      return;
     }
 
-    const handleOTPValidation = async () => {
-        if(!otpCode.trim()) {
-            Alert. alert('Invalid', 'OTP code is required.');
-            return;
-        }
+    setOtpSpinner(true);
+    try {
+      const response = await OTPValidation(Number(otpCode), sessionId);
 
-        setOtpSpinner(true);
-        try {
-            const response = await OTPValidation(Number(otpCode), sessionId);
-            
-            if(!response.error) {
-                await AsyncStorage.setItem('device_token', response.device_token);
-                await AsyncStorage.setItem('access_token', response.access_token);
+      if (!response.error) {
+        await AsyncStorage.setItem("device_token", response.device_token);
+        await AsyncStorage.setItem("access_token", response.access_token);
 
-                router.replace('/(tabs)/dashboard')
-            }
-        }catch(error: any) {
-            Alert.alert('Error', error.message);
-        }finally {
-            setOtpSpinner(false)
-        }
+        router.replace("/(tabs)/dashboard");
+      }
+    } catch (error: any) {
+      Alert.alert("Error", error.message);
+    } finally {
+      setOtpSpinner(false);
     }
+  };
 
-    const handleResendOtp = () => {
-        resetTimer();
-        handleLogin();
-    }
+  const handleResendOtp = () => {
+    resetTimer();
+    handleLogin();
+  };
 
     return (
         <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === 'ios' ? 'padding' : 'height'} >
@@ -295,7 +295,6 @@ export default function Index() {
         </KeyboardAvoidingView>
     )
 }
-
 
 const styles = StyleSheet.create({
     container: {
