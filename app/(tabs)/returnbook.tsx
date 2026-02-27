@@ -6,10 +6,10 @@ import { useColorScheme } from "@/hooks/use-color-scheme";
 import { Ionicons } from "@expo/vector-icons";
 import { CameraType, useCameraPermissions } from "expo-camera";
 import { useState } from "react";
-import { Dimensions, StyleSheet, TouchableOpacity, View } from "react-native";
+import { Dimensions, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { QrResultModal } from "../returnresultModal";
 
-const { width } = Dimensions.get("window");
+const { width } = Dimensions.get("screen");
 const FRAME_SIZE = width * 0.8;
 
 export default function TabTwoScreen() {
@@ -60,9 +60,10 @@ export default function TabTwoScreen() {
         <Ionicons
           name="book"
           size={36}
-          color={Colors[colorScheme ?? "light"].tint}
+          color={'#3498db'}
+          style={{backgroundColor: '#fff', padding: 10, borderRadius: 8 }}
         />
-        <ThemedText style={styles.title}>Return a Book</ThemedText>
+        <Text style={styles.title}>Return a Book</Text>
         <ThemedText style={styles.subtitle}>
           Scan the QR or Barcode on your book to process a return.
         </ThemedText>
@@ -89,7 +90,7 @@ export default function TabTwoScreen() {
         activeOpacity={0.85}
       >
         <Ionicons name="qr-code" size={24} color="#fff" />
-        <ThemedText style={styles.buttonText}>Scan Book QR/Barcode</ThemedText>
+        <Text style={styles.buttonText}>Scan Book QR</Text>
       </TouchableOpacity>
 
       <QrResultModal
@@ -107,7 +108,7 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     paddingHorizontal: 24,
-    backgroundColor: "transparent",
+    backgroundColor: '#f5f5f5',
   },
   header: {
     alignItems: "center",
@@ -115,14 +116,14 @@ const styles = StyleSheet.create({
   },
   title: {
     fontSize: 26,
-    fontWeight: "bold",
+    fontWeight: "800",
     marginTop: 10,
     color: "#3498db",
   },
   subtitle: {
-    fontSize: 16,
+    fontSize: 14,
     color: "#888",
-    marginTop: 6,
+    marginTop: 10,
     textAlign: "center",
     maxWidth: 300,
   },
@@ -144,12 +145,13 @@ const styles = StyleSheet.create({
     color: "#888",
   },
   scanButton: {
+    width: '90%',
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
     paddingVertical: 16,
     paddingHorizontal: 36,
-    borderRadius: 30,
+    borderRadius: 10,
     backgroundColor: "#3498db",
     shadowColor: "#3498db",
     shadowOffset: { width: 0, height: 4 },

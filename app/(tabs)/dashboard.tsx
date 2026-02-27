@@ -5,7 +5,7 @@ import { router } from "expo-router";
 import { useEffect, useState } from "react";
 import { ActivityIndicator, Alert, Dimensions, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 
-const { height, width } = Dimensions.get('window');
+const { height, width } = Dimensions.get('screen');
 const logo = require('@/assets/images/logo.png')
 
 
@@ -50,7 +50,7 @@ export default function BooksView() {
                 <>
                     {/* Header */}
                     <View style={styles.header}>
-                        <Text style={styles.headerTitle}>Boyet Dedal</Text>
+                        <Text style={styles.headerTitle}>MLGCL LIBRARY</Text>
                         <TouchableOpacity onPress={() => router.push('/search')} style={styles.searchButton}>
                             <Ionicons name={'search'} color={'#fff'} size={24} />
                         </TouchableOpacity>
@@ -137,9 +137,10 @@ const styles = StyleSheet.create({
         paddingHorizontal: 20,
     },
     headerTitle: {
-        fontWeight: '700',
-        fontSize: 24,
+        fontWeight: '800',
+        fontSize: 16,
         color: '#fff',
+        letterSpacing: 1
     },
     searchButton: {
         padding: 5,
@@ -202,7 +203,7 @@ const styles = StyleSheet.create({
         backgroundColor: 'rgba(255, 255, 255, 0.25)',
         paddingVertical: 10,
         paddingHorizontal: 20,
-        borderRadius: 25,
+        borderRadius: 8,
         alignSelf: 'flex-end',
         marginTop: 15,
     },
@@ -232,7 +233,7 @@ const styles = StyleSheet.create({
     fab: {
         position: 'absolute',
         right: 20,
-        bottom: 100,
+        bottom: 20,
         width: 64,
         height: 64,
         borderRadius: 32,
