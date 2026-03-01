@@ -1,5 +1,5 @@
 import { fetchReservationRecords } from "@/api/FetchReservationRecord";
-import { MaterialCommunityIcons } from "@expo/vector-icons";
+import { Ionicons } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { useRouter } from "expo-router";
@@ -154,7 +154,7 @@ export default function ReservationView() {
       </View>
       <TouchableOpacity
         style={{
-          backgroundColor: "#2196f3",
+          backgroundColor: "#3498db",
           borderRadius: 10,
           paddingVertical: 12,
           alignItems: "center",
@@ -176,11 +176,9 @@ export default function ReservationView() {
         style={{
           width: "100%",
           paddingTop: 40,
-          paddingBottom: 16,
+          paddingBottom: 20,
           paddingHorizontal: 20,
-          backgroundColor: "#2196f3",
-          borderBottomLeftRadius: 18,
-          borderBottomRightRadius: 18,
+          backgroundColor: "#3498db",
           flexDirection: "row",
           alignItems: "center",
           shadowColor: "#000",
@@ -189,32 +187,25 @@ export default function ReservationView() {
           elevation: 4,
         }}
       >
-        <Text style={{ color: "#fff", fontSize: 26, fontWeight: "700" }}>
-          Reservation
+        <Text style={{ color: "#fff", fontSize: 18, fontWeight: "700" }}>
+          Reservations
         </Text>
       </View>
 
       {/* Search Bar */}
-      <View style={{ padding: 16, paddingBottom: 0 }}>
-        <TextInput
-          placeholder="Search reservation"
-          value={search}
-          onChangeText={setSearch}
-          placeholderTextColor="#b0b8c1"
-          style={{
-            backgroundColor: "#fff",
-            borderRadius: 14,
-            paddingHorizontal: 18,
-            paddingVertical: 13,
-            fontSize: 16,
-            shadowColor: "#000",
-            shadowOpacity: 0.07,
-            shadowRadius: 5,
-            elevation: 2,
-            marginBottom: 12,
-            borderWidth: 0,
-          }}
-        />
+      <View style={{ paddingHorizontal: 16, marginTop: 10, }}>
+        <View style={{ flexDirection: 'row', alignItems: 'center', borderRadius: 14, paddingBottom: 0, backgroundColor: "#fff", paddingVertical: 3, paddingHorizontal: 18, shadowColor: "#000", shadowOpacity: 0.07,  elevation: 2, shadowRadius: 5, marginBottom: 12, }}>
+          <Ionicons name={'search'} size={18} color={'#b0b8c1'} />
+          <TextInput
+            placeholder="Search reservation"
+            value={search}
+            onChangeText={setSearch}
+            placeholderTextColor="#b0b8c1"
+            style={{
+              fontSize: 16,
+            }}
+          />
+        </View>
       </View>
 
       {/* Reservation List */}
@@ -225,7 +216,7 @@ export default function ReservationView() {
           paddingBottom: 100,
         }}
         refreshControl={
-          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} colors={['#3498db']} />
         }
         keyboardShouldPersistTaps="handled"
       >
@@ -252,7 +243,7 @@ export default function ReservationView() {
       </ScrollView>
 
       {/* Floating QR Button */}
-      <TouchableOpacity
+      {/* <TouchableOpacity
         onPress={() => router.push("/borrow")}
         style={{
           position: "absolute",
@@ -272,7 +263,7 @@ export default function ReservationView() {
         activeOpacity={0.8}
       >
         <MaterialCommunityIcons name="qrcode-scan" size={28} color="#fff" />
-      </TouchableOpacity>
+      </TouchableOpacity> */}
     </View>
   );
 }

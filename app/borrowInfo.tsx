@@ -42,7 +42,7 @@ export default function BorrowInfo() {
 
 
     return (
-        <View style={{ backgroundColor: '#fff', height: '100%',  position: 'absolute', top: 0 }}>
+        <View style={{ backgroundColor: '#f8f8f8', height: '100%',  position: 'absolute', top: 0, width }}>
             <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', backgroundColor: '#3498db', height: 100, width, paddingTop: 40, paddingHorizontal: 20 }}>
                 <Text style={{ color: '#fff', fontSize: 20, fontWeight: 'bold' }}>Borrow Details</Text>
             </View>
@@ -54,51 +54,51 @@ export default function BorrowInfo() {
                 <View style={{ flexDirection: 'column', height: '90%', justifyContent: 'space-between', paddingHorizontal: 20, paddingVertical: 20 }}>
                     <View>
                         <View>
-                            <Text style={{ fontSize: 25, fontWeight: '900' }}>{borrowedBook?.bookTitle}</Text>
-                            <Text style={{ fontSize: 18, marginTop: 5 }}>{borrowedBook?.bookSubtitle}</Text>
-                            <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginTop: 16 }}>
+                            <Text style={{ fontSize: 25, fontWeight: '900', textAlign: 'center' }}>{borrowedBook?.bookTitle}</Text>
+                            <Text style={{ fontSize: 16, marginTop: 5, textAlign: 'center', fontStyle: 'italic', opacity: 0.6 }}>{borrowedBook?.bookSubtitle}</Text>
+                            <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginTop: 20 }}>
                                 <View>
-                                    <Text style={{ opacity: 0.5 }}>Book Author</Text>
-                                    <Text style={{ fontWeight: '600' }}>{borrowedBook?.bookAuthor}</Text>
+                                    <Text style={{ opacity: 0.5, fontSize: 13 }}>Book Author</Text>
+                                    <Text style={{ fontWeight: '800' }}>{borrowedBook?.bookAuthor}</Text>
                                 </View>
                                 <View style={{ alignItems: 'flex-end' }}>
-                                    <Text style={{ opacity: 0.5 }}>Classification</Text>
-                                    <Text style={{ fontWeight: '600'}}>{borrowedBook?.bookClassification}</Text>
+                                    <Text style={{ opacity: 0.5, fontSize: 13 }}>Classification</Text>
+                                    <Text style={{ fontWeight: '800'}}>{borrowedBook?.bookClassification}</Text>
                                 </View>
                             </View>
                             <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginTop: 16 }}>
                                 <View>
-                                    <Text style={{ opacity: 0.5 }}>Language</Text>
-                                    <Text style={{ fontWeight: '600', fontSize: 14 }}>{borrowedBook?.bookLanguage}</Text>
+                                    <Text style={{ opacity: 0.5, fontSize: 13 }}>Language</Text>
+                                    <Text style={{ fontWeight: '800', fontSize: 14 }}>{borrowedBook?.bookLanguage}</Text>
                                 </View>
                                 <View style={{ alignItems: 'flex-end' }}>
-                                    <Text style={{ opacity: 0.5 }}>Year Published</Text>
-                                    <Text style={{ fontWeight: '600', fontSize: 14 }}>{borrowedBook?.bookPublished}</Text>
+                                    <Text style={{ opacity: 0.5, fontSize: 13 }}>Year Published</Text>
+                                    <Text style={{ fontWeight: '800', fontSize: 14 }}>{borrowedBook?.bookPublished}</Text>
                                 </View>
                             </View>
                         </View>
                         
-                        <View style={{ marginTop: 20, flexDirection: 'row', justifyContent: 'space-between', borderTopColor: '#dbdbdb', borderTopWidth: 1, paddingVertical: 5 }}>
+                        <View style={{ marginTop: 20, flexDirection: 'row', justifyContent: 'space-between', padding: 10, backgroundColor: '#fff',  elevation: 2, borderRadius: 12 }}>
                             <View style={{ alignItems: 'center', borderRightWidth: 1, borderColor: '#dbdbdb', width: '33%' }}>
-                                <Text style={{ opacity: 0.5 }}>Available</Text>
-                                <Text style={{ fontWeight: '600', fontSize: 14 }}>{borrowedBook?.availableCopies}</Text>
+                                <Text style={{ opacity: 0.5, fontWeight: '800' }}>Available</Text>
+                                <Text style={{ fontWeight: '800', fontSize: 14 }}>{borrowedBook?.availableCopies}</Text>
                             </View>
                             <View style={{ alignItems: 'center', borderRightWidth: 1, borderColor: '#dbdbdb', width: '33%' }}>
-                                <Text style={{ opacity: 0.5 }}>Borrowed</Text>
-                                <Text style={{ fontWeight: '600', fontSize: 14 }}>0</Text>
+                                <Text style={{ opacity: 0.5, fontWeight: '800' }}>Borrowed</Text>
+                                <Text style={{ fontWeight: '800', fontSize: 14 }}>0</Text>
                             </View>
                             <View style={{ alignItems: 'center', justifyContent: 'center', width: '33%' }}>
-                                <Text style={{ opacity: 0.5 }}>Reserved</Text>
-                                <Text style={{ fontWeight: '600', fontSize: 14 }}>{borrowedBook?.reserved}</Text>
+                                <Text style={{ opacity: 0.5, fontWeight: '800' }}>Reserved</Text>
+                                <Text style={{ fontWeight: '800', fontSize: 14 }}>{borrowedBook?.reserved}</Text>
                             </View>
                         </View>
                         <View style={{ marginTop: 50 }}>
-                            <Text style={{ opacity: 0.7, fontSize: 18, fontWeight: '600' }}>Borrower Details</Text>
-                            <View style={{ flexDirection: 'row', alignItems: 'flex-start', gap: 20, paddingTop: 20 }}>
-                                <Image source={{ uri: borrowedBook?.userImage }} style={{ height: 100, width: 100 }} />
-                                <View>
-                                    <Text style={{ fontSize: 18, fontWeight: 700 }}>{borrowedBook?.userName}</Text>
-                                    <Text style={{ opacity: 0.7, marginTop: 5 }}>{borrowedBook?.userType.toUpperCase()}</Text>
+                            <Text style={{ opacity: 0.5, fontSize: 18, fontWeight: '800' }}>Borrower Details</Text>
+                            <View style={{ flexDirection: 'row', alignItems: 'flex-start', gap: 20, backgroundColor: '#fff', paddingHorizontal: 10, paddingVertical: 12, marginTop: 15, elevation: 2, borderRadius: 12 }}>
+                                <Image source={{ uri: borrowedBook?.userImage }} style={{ height: 80, width: 80 }} />
+                                <View style={{ width: '60%' }}>
+                                    <Text style={{ fontSize: 17, fontWeight: '900' }}>{borrowedBook?.userName}</Text>
+                                    <Text style={{ marginTop: 5, backgroundColor: '#EAF4FB', color: '#3498db', fontWeight: '800', fontSize: 10, alignSelf: 'flex-start', paddingHorizontal: 8, paddingVertical: 3, borderRadius: 20 }}>{borrowedBook?.userType.toUpperCase()}</Text>
                                 </View>
                             </View>
                         </View>

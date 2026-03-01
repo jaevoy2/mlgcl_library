@@ -93,7 +93,7 @@ export default function SearchView() {
             >
                 <View style={{ width: '65%' }}>
                     <Text style={{ fontSize: 18, fontWeight: '600' }}>{bookData.title}</Text>
-                    <Text style={{ opacity: 0.5 }}>{bookData.subtitle}</Text>
+                    <Text style={{ opacity: 0.5, fontStyle: 'italic' }}>{bookData.subtitle}</Text>
                 </View>
                 <View style={{ flexDirection: 'column', alignItems: 'flex-end' }}>
                     <Text style={{ opacity: 0.5, fontSize: 10 }}>Book Code</Text>
@@ -122,7 +122,7 @@ export default function SearchView() {
                         borderColor: 'transparent',
                         backgroundColor: '#E6E6E6',
                         borderWidth: 1,
-                        borderRadius: 5,
+                        borderRadius: 14,
                         flexDirection: 'row',
                         alignItems: 'center',
                         justifyContent: 'space-between',
@@ -163,10 +163,12 @@ export default function SearchView() {
                                 index,
                             })}
                         />
-                    ) : (
+                    ) : books.length == 0 && searchValue != '' ? (
                         <View>
                             <Text style={{ opacity: 0.5, textAlign: 'center' }}>Book not found</Text>
                         </View>
+                    ) : (
+                        <View />
                     )}
                 </View>
             </View>

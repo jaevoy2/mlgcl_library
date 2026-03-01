@@ -1,7 +1,6 @@
-import { MaterialCommunityIcons } from "@expo/vector-icons";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { useNavigation, useRoute } from "@react-navigation/native";
-import { Stack, router } from "expo-router";
+import { Stack } from "expo-router";
 import {
   Dimensions,
   ScrollView,
@@ -36,9 +35,7 @@ export default function BookDetail() {
             paddingTop: 40,
             paddingBottom: 16,
             paddingHorizontal: 20,
-            backgroundColor: "#16a2e5",
-            borderBottomLeftRadius: 18,
-            borderBottomRightRadius: 18,
+            backgroundColor: "#3498db",
             flexDirection: "row",
             alignItems: "center",
             shadowColor: "#000",
@@ -56,7 +53,7 @@ export default function BookDetail() {
             </Text>
           </TouchableOpacity>
 
-          <Text style={{ color: "#fff", fontSize: 24, fontWeight: "700" }}>
+          <Text style={{ color: "#fff", fontSize: 18, fontWeight: "700" }}>
             Reservation Details
           </Text>
         </View>
@@ -84,7 +81,7 @@ export default function BookDetail() {
             <View
               key={idx}
               style={{
-                backgroundColor: "#16a2e5",
+                backgroundColor: "#3498db",
                 borderRadius: 24,
                 padding: 22,
                 marginBottom: 22,
@@ -141,13 +138,13 @@ export default function BookDetail() {
         </ScrollView>
 
         {/* Floating QR Button */}
-        <TouchableOpacity
+        {/* <TouchableOpacity
           onPress={() => router.push("/borrow")}
           style={{
             position: "absolute",
             bottom: 28,
             right: 24,
-            backgroundColor: "#16a2e5",
+            backgroundColor: "#3498db",
             borderRadius: 32,
             width: 64,
             height: 64,
@@ -161,7 +158,7 @@ export default function BookDetail() {
           activeOpacity={0.8}
         >
           <MaterialCommunityIcons name="qrcode-scan" size={32} color="#fff" />
-        </TouchableOpacity>
+        </TouchableOpacity> */}
       </View>
     </>
   );

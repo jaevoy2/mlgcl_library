@@ -2,7 +2,7 @@ import { FetchBorrowings } from "@/api/borrowings";
 import { Ionicons } from "@expo/vector-icons";
 import { router } from "expo-router";
 import { useEffect, useState } from "react";
-import { ActivityIndicator, Alert, Dimensions, FlatList, Modal, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from "react-native";
+import { ActivityIndicator, Alert, Dimensions, FlatList, Image, Modal, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from "react-native";
 
 type Book = {
     id: number;
@@ -29,9 +29,10 @@ type BookBorrowingProps = {
     book_copy_id: number;
     borrowed_at: string;
     returned_at: string | null;
-    user_id: number;
     book_copy: BookCopy;
-    user: User;
+    user_id: number;
+    full_name: string;
+    image_url?: string;
 }
 
 const { height, width } = Dimensions.get('screen')
@@ -68,6 +69,7 @@ export default function BorrowingsView() {
             console.log('Fetch borrowings: ', error.message)
         } finally {
             setLoading(false)
+            console.log(borrowings)
         }
     }
 
@@ -95,7 +97,7 @@ export default function BorrowingsView() {
 
     const filteredBorrowings = borrowings.filter((borrowing) => {
         const bookTitle = borrowing.book_copy?.book?.title?.toLowerCase() || '';
-        const userName = borrowing.user?.name?.toLowerCase() || '';
+        const userName = borrowing?.full_name?.toLowerCase() || '';
         const query = searchQuery.toLowerCase();
 
         return bookTitle.includes(query) || userName.includes(query);
@@ -134,12 +136,16 @@ export default function BorrowingsView() {
 
             <View style={styles.userSection}>
                 <View style={styles.userAvatar}>
-                    <Text style={styles.userInitial}>
-                        {item.user?.name?.charAt(0).toUpperCase() || 'U'}
-                    </Text>
+                    {item.image_url ? (
+                        <Image source={{ uri: item.image_url }} />
+                    ) : (
+                        <Text style={styles.userInitial}>
+                            {item?.full_name?.charAt(0).toUpperCase() || 'U'}
+                        </Text>
+                    )}
                 </View>
                 <Text style={styles.userName}>
-                    {item.user?.name || 'Unknown User'}
+                    {item.full_name || 'Unknown User'}
                 </Text>
             </View>
 
@@ -229,19 +235,23 @@ export default function BorrowingsView() {
 
                                 <View style={styles.borrowerCard}>
                                     <View style={styles.userAvatar}>
-                                        <Text style={styles.userInitial}>
-                                            {selectedBorrowing.user?.name?.charAt(0).toUpperCase() || 'U'}
-                                        </Text>
+                                        {!selectedBorrowing.image_url ? (
+                                            <Text style={styles.userInitial}>
+                                                {selectedBorrowing.full_name.charAt(0).toUpperCase() || 'U'}
+                                            </Text>
+                                        ) : (
+                                            <Image source={{ uri: selectedBorrowing.image_url }} />
+                                        )}
                                     </View>
                                     <View style={{ flex: 1 }}>
                                         <Text style={styles.modalUserName}>
-                                            {selectedBorrowing.user?.name || 'Unknown User'}
+                                            {selectedBorrowing.full_name || 'Unknown User'}
                                         </Text>
-                                        {selectedBorrowing.user?.email && (
+                                        {/* {selectedBorrowing.user?.email && (
                                             <Text style={styles.modalUserEmail}>
                                                 {selectedBorrowing.user.email}
                                             </Text>
-                                        )}
+                                        )} */}
                                     </View>
                                 </View>
                             </View>
@@ -574,15 +584,14 @@ const styles = StyleSheet.create({
         justifyContent: 'space-between',
         alignItems: 'center',
         paddingVertical: 20,
-        paddingHorizontal: 4,
         gap: 12,
     },
     paginationButton: {
         flexDirection: 'row',
         alignItems: 'center',
-        paddingHorizontal: 20,
+        paddingHorizontal: 15,
         paddingVertical: 12,
-        borderRadius: 25,
+        borderRadius: 8,
         backgroundColor: '#FFFFFF',
         borderWidth: 1,
         borderColor: '#E0E0E0',
@@ -610,7 +619,6 @@ const styles = StyleSheet.create({
         color: '#B0BEC5',
     },
     pageIndicatorContainer: {
-        paddingHorizontal: 16,
         paddingVertical: 8,
     },
     pageIndicatorText: {

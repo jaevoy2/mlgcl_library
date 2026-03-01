@@ -42,9 +42,10 @@ export default function HomeScreen() {
   const [showBookModal, setShowBookModal] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const hasScanned = useRef(false);
-  const [bookCopies, setBookCopies] = useState<any>(null);
+  const [bookCopies, setBookCopies] = useState<any>(0);
   const [isBorrowerScanned, setIsBorrowerScanned] = useState(false);
-  const [reserved, setReserved] = useState<any>(null);
+  const [reserved, setReserved] = useState<any>(0);
+  const [borrowed, setBorrowed] = useState<any>(0)
 
   // Auto-request camera permission on mount
   useEffect(() => {
@@ -119,6 +120,7 @@ export default function HomeScreen() {
         setBookCopies(bookData.acopies);
 
         setReserved(bookData.reserved);
+        setBorrowed(bookData.borrowed);
         
         setBorrowedBook({
           bookCopyId: bookData.copy.id,
@@ -130,6 +132,7 @@ export default function HomeScreen() {
           bookLanguage: bookData.book.language.name,
           availableCopies: bookData.acopies,
           reserved: bookData.reserved,
+          borrowed: bookData.borrowed,
           hasScannedBook: true
         });
 
@@ -269,7 +272,7 @@ export default function HomeScreen() {
                           Publication Year
                         </Text>
                         {scannedBook.publication_year && (
-                          <Text style={{fontSize: 16, marginTop: 3}}>
+                          <Text style={{ fontSize: 16, marginTop: 3, fontWeight: '800' }}>
                             {scannedBook.publication_year}
                           </Text>
                         )}
@@ -281,7 +284,7 @@ export default function HomeScreen() {
                         </Text>
                         {scannedBook.authors.length > 0 ? (
                           scannedBook.authors.map((author: any) => (
-                            <Text key={author.id} style={{ fontSize: 16}}>{author.name}</Text>
+                            <Text key={author.id} style={{ fontSize: 16, fontWeight: '800' }}>{author.name}</Text>
                           ))
                         ) : (
                           <Text>No authors found.</Text>
@@ -294,25 +297,31 @@ export default function HomeScreen() {
                         <Text style={{ opacity: 0.7}}>
                           Available Copy
                         </Text>
-                        {bookCopies && (
-                          <Text style={{fontSize: 16 }}>
-                            {bookCopies}
-                          </Text>
-                        )}
+                        <Text style={{fontSize: 16, fontWeight: '800' }}>
+                          {bookCopies ?? 0}
+                        </Text>
                       </View>
                       <View style={{marginTop: 10}}>
                         <Text style={{ opacity: 0.7}}>
                           Reserved
                         </Text>
-                        <Text style={{fontSize: 16 }}>
-                          {reserved ?? 0}
+                        <Text style={{fontSize: 16, fontWeight: '800' }}>
+                          {reserved}
                         </Text>
-                    </View>
+                      </View>
+                      <View style={{marginTop: 10}}>
+                        <Text style={{ opacity: 0.7}}>
+                          Borrowed
+                        </Text>
+                        <Text style={{fontSize: 16, fontWeight: '800' }}>
+                          {borrowed}
+                        </Text>
+                      </View>
                     </View>
                   </View>
                   {scannedBook.description && (
                     <View style={styles.descriptionContainer}>
-                      <Text style={[styles.sectionLabel, { color: theme.text }]}>
+                      <Text style={ styles.sectionLabel }>
                         Description
                       </Text>
                       <Text style={[styles.bookDescription, { color: theme.text }]}>
@@ -323,6 +332,7 @@ export default function HomeScreen() {
                 </ View>
                 <TouchableOpacity
                   onPress={() => scanUserQr()}
+                  disabled={bookCopies == 0}
                   style={{
                     backgroundColor: '#3498db',
                     padding: 12,
@@ -537,8 +547,8 @@ const styles = StyleSheet.create({
     lineHeight: 34,
   },
   bookSubtitle: {
-    fontSize: 18,
-    opacity: 0.8,
+    fontSize: 16,
+    opacity: 0.6,
     marginBottom: 30,
     lineHeight: 24,
   },
@@ -547,7 +557,12 @@ const styles = StyleSheet.create({
   },
   sectionLabel: {
     marginBottom: 10,
-    opacity: 0.7,
+    fontWeight: '800',
+    fontSize: 16,
+    borderBottomWidth: 2,
+    borderBottomColor: '#3498db',
+    alignSelf: 'flex-start',
+    paddingBottom: 5
   },
   bookDescription: {
     fontSize: 15,

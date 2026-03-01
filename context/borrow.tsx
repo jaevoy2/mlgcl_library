@@ -11,6 +11,7 @@ export type BorrowProps = {
     bookLanguage?: string;
     availableCopies?: number;
     reserved?: number;
+    borrowed: number;
     borrowDate?: string;
     returnDate?: string;
     userId?: number;
