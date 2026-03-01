@@ -69,7 +69,7 @@ export default function BooksView() {
                                     </View>
                                 </View>
                                 <View style={styles.cardRight}>
-                                    <Text style={styles.cardLabel}>Book Copies</Text>
+                                    <Text style={styles.cardLabel}>Total Copies</Text>
                                     <Text style={styles.cardValueMedium}>{bookCopies}</Text>
                                 </View>
                             </View>
@@ -85,14 +85,14 @@ export default function BooksView() {
                                         <Text style={styles.cardValueLarge}>{borrowedBooks}</Text>
                                     </View>
                                 </View>
+                                <TouchableOpacity 
+                                    onPress={() => router.push('../borrowing')} 
+                                    style={styles.viewDetailsButton}
+                                >
+                                    <Ionicons name={'open-outline'} size={18} color={'#fff'} />
+                                    <Text style={styles.viewDetailsText}>View</Text>
+                                </TouchableOpacity>
                             </View>
-                            <TouchableOpacity 
-                                onPress={() => router.push('../borrowing')} 
-                                style={styles.viewDetailsButton}
-                            >
-                                <Ionicons name={'open-outline'} size={18} color={'#fff'} />
-                                <Text style={styles.viewDetailsText}>View Details</Text>
-                            </TouchableOpacity>
                         </View>
 
                         {/* Footer Text */}
@@ -102,13 +102,20 @@ export default function BooksView() {
                         </View>
                     </View>
 
-                    {/* Floating Action Button */}
-                    <TouchableOpacity 
-                        onPress={() => router.push('/borrow')} 
-                        style={styles.fab}
-                    >
-                        <MaterialCommunityIcons name={'qrcode-scan'} size={28} color={'#fff'} />
-                    </TouchableOpacity>
+                    <View style={styles.floatingCon}>
+                        <TouchableOpacity 
+                            onPress={() => router.push('/borrow')} 
+                            style={styles.fab}
+                        >
+                            <MaterialCommunityIcons name={'qrcode-scan'} size={28} color={'#fff'} />
+                        </TouchableOpacity>
+                        <TouchableOpacity 
+                            // onPress={() => router.push('/borrow')} 
+                            style={styles.fabReturn}
+                        >
+                            <MaterialCommunityIcons name={'line-scan'} size={28} color={'#fff'} />
+                        </TouchableOpacity>
+                    </View>
                 </>
             )}
         </View>
@@ -166,6 +173,11 @@ const styles = StyleSheet.create({
         justifyContent: 'space-between',
         alignItems: 'flex-start',
     },
+    borrowCardContent: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+    },
     cardLeft: {
         flex: 1,
     },
@@ -202,7 +214,7 @@ const styles = StyleSheet.create({
         gap: 8,
         backgroundColor: 'rgba(255, 255, 255, 0.25)',
         paddingVertical: 10,
-        paddingHorizontal: 20,
+        paddingHorizontal: 15,
         borderRadius: 8,
         alignSelf: 'flex-end',
         marginTop: 15,
@@ -230,14 +242,32 @@ const styles = StyleSheet.create({
         marginTop: 5,
         textAlign: 'center',
     },
-    fab: {
+    floatingCon: {
         position: 'absolute',
         right: 20,
         bottom: 20,
+        flexDirection: 'column',
+        alignItems: 'center',
+        gap: 10
+    },
+    fab: {
         width: 64,
         height: 64,
         borderRadius: 32,
         backgroundColor: '#3498db',
+        justifyContent: 'center',
+        alignItems: 'center',
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 4 },
+        shadowOpacity: 0.3,
+        shadowRadius: 8,
+        elevation: 8,
+    },
+    fabReturn: {
+        width: 64,
+        height: 64,
+        borderRadius: 32,
+        backgroundColor: '#25AD76',
         justifyContent: 'center',
         alignItems: 'center',
         shadowColor: '#000',
