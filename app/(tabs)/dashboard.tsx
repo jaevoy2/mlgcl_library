@@ -1,14 +1,12 @@
 import { FetchBooks } from "@/api/books";
 import { Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
-import AsyncStorage from "@react-native-async-storage/async-storage";
 import { router } from "expo-router";
 import { useEffect, useState } from "react";
-import { ActivityIndicator, Alert, Dimensions, ScrollView, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { ActivityIndicator, Alert, Dimensions, Image, ScrollView, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { PieChart } from 'react-native-gifted-charts';
 
 const { height, width } = Dimensions.get('screen');
-const logo = require('@/assets/images/logo.png')
-
+const libraryBg = require('@/assets/images/dashboardbackground.jpg');
 
 export default function BooksView() {
     const [loading, setLoading] = useState(false);
@@ -22,13 +20,12 @@ export default function BooksView() {
 
     useEffect(() => {
         handleFetchBooks();
-    }, [])
+    }, []);
 
-    const handleFetchBooks = async() => {
+    const handleFetchBooks = async () => {
         try {
             const response = await FetchBooks();
-
-            if(!response.error) {
+            if (!response.error) {
                 setBookCount(response.book_count);
                 setAvailableBooks(response.available_count);
                 setBookCopies(response.copy_count);
@@ -37,17 +34,12 @@ export default function BooksView() {
                 setUnavailableCopies(response.unvailable_count);
 
             }
-        }catch(error: any) {
+        } catch (error: any) {
             Alert.alert('Error', error.message || 'Failed to load data. Please check your internet connection');
-        }finally {
+        } finally {
             setLoading(false);
         }
-    }
-
-    const handleLogout = async () => {
-        await AsyncStorage.clear();
-        router.replace('/')
-    } 
+    };
 
     const pieData = [
         { value: availableBooks, color: '#068a65', text: `${Math.round(availableBooks / bookCopies * 100)}%` },
@@ -58,12 +50,21 @@ export default function BooksView() {
 
 
 
-
     return (
         <View style={styles.container}>
-            {loading == true ? (
+            {/* Background Image */}
+            <Image
+                source={libraryBg}
+                style={styles.backgroundImage}
+                resizeMode="cover"
+            />
+
+            {/* Dark overlay */}
+            <View style={styles.overlay} />
+
+            {loading ? (
                 <View style={styles.loadingContainer}>
-                    <ActivityIndicator color={'#3498db'} size={'large'} />
+                    <ActivityIndicator color={'#fff'} size={'large'} />
                 </View>
             ) : (
                 <>
@@ -104,8 +105,8 @@ export default function BooksView() {
                                         <Text style={styles.cardValueLarge}>{borrowedBooks}</Text>
                                     </View>
                                 </View>
-                                <TouchableOpacity 
-                                    onPress={() => router.push('../borrowing')} 
+                                <TouchableOpacity
+                                    onPress={() => router.push('../borrowing')}
                                     style={styles.viewDetailsButton}
                                 >
                                     <Ionicons name={'open-outline'} size={18} color={'#fff'} />
@@ -124,22 +125,23 @@ export default function BooksView() {
                             />
                         </View>
 
-                        {/* Footer Text */}
+                        {/* Footer */}
                         <View style={styles.footer}>
                             <Text style={styles.footerTitle}>MLG COLLEGE OF LEARNING, INC.</Text>
                             <Text style={styles.footerSubtitle}>Library Management System v1.0</Text>
                         </View>
                     </ScrollView>
 
+                    {/* Floating Buttons */}
                     <View style={styles.floatingCon}>
-                        <TouchableOpacity 
-                            onPress={() => router.push('/borrow')} 
+                        <TouchableOpacity
+                            onPress={() => router.push('/borrow')}
                             style={styles.fab}
                         >
                             <MaterialCommunityIcons name={'qrcode-scan'} size={28} color={'#fff'} />
                         </TouchableOpacity>
-                        <TouchableOpacity 
-                            // onPress={() => router.push('/borrow')} 
+                        <TouchableOpacity
+                            onPress={() => router.push('/returnbook')}
                             style={styles.fabReturn}
                         >
                             <MaterialCommunityIcons name={'line-scan'} size={28} color={'#fff'} />
@@ -148,26 +150,36 @@ export default function BooksView() {
                 </>
             )}
         </View>
-    )
+    );
 }
 
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: '#F5F5F5',
         position: 'relative',
+    },
+    backgroundImage: {
+        position: 'absolute',
+        top: 0,
+        left: 0,
+        width: '100%',
+        height: '100%',
+    },
+    overlay: {
+        ...StyleSheet.absoluteFillObject,
+        backgroundColor: 'rgba(0, 0, 0, 0.55)',
     },
     loadingContainer: {
         width,
         height,
         justifyContent: 'center',
-        alignContent: 'center',
+        alignItems: 'center',
     },
     header: {
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'space-between',
-        backgroundColor: '#3498db',
+        backgroundColor: 'rgba(52, 152, 219, 0.75)',
         paddingTop: 50,
         paddingBottom: 20,
         paddingHorizontal: 20,
@@ -176,7 +188,7 @@ const styles = StyleSheet.create({
         fontWeight: '800',
         fontSize: 16,
         color: '#fff',
-        letterSpacing: 1
+        letterSpacing: 1,
     },
     searchButton: {
         padding: 5,
@@ -187,13 +199,15 @@ const styles = StyleSheet.create({
         paddingHorizontal: 20,
     },
     card: {
-        backgroundColor: '#5DADE2',
+        backgroundColor: 'rgba(52, 152, 219, 0.55)',
         borderRadius: 20,
         padding: 24,
         marginBottom: 20,
+        borderWidth: 1,
+        borderColor: 'rgba(255,255,255,0.2)',
         shadowColor: '#000',
         shadowOffset: { width: 0, height: 4 },
-        shadowOpacity: 0.15,
+        shadowOpacity: 0.3,
         shadowRadius: 8,
         elevation: 5,
     },
@@ -201,11 +215,6 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         justifyContent: 'space-between',
         alignItems: 'flex-start',
-    },
-    borrowCardContent: {
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-        alignItems: 'center',
     },
     cardLeft: {
         flex: 1,
@@ -226,13 +235,13 @@ const styles = StyleSheet.create({
         gap: 12,
     },
     cardValueLarge: {
-        fontWeight: '900',
+        fontWeight: '700',
         fontSize: 48,
         color: '#fff',
         lineHeight: 56,
     },
     cardValueMedium: {
-        fontWeight: '900',
+        fontWeight: '700',
         fontSize: 36,
         color: '#fff',
         marginTop: 5,
@@ -260,14 +269,14 @@ const styles = StyleSheet.create({
     footerTitle: {
         fontSize: 13,
         fontWeight: '600',
-        color: '#A0B8C5',
+        color: 'rgba(255,255,255,0.8)',
         letterSpacing: 1,
         textAlign: 'center',
     },
     footerSubtitle: {
         fontSize: 11,
         fontWeight: '400',
-        color: '#C5D4DB',
+        color: 'rgba(255,255,255,0.6)',
         marginTop: 5,
         textAlign: 'center',
     },
@@ -277,7 +286,7 @@ const styles = StyleSheet.create({
         bottom: 20,
         flexDirection: 'column',
         alignItems: 'center',
-        gap: 10
+        gap: 10,
     },
     fab: {
         width: 64,

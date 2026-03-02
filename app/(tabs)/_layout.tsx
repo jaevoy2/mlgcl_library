@@ -56,23 +56,12 @@ export default function TabsLayout() {
           }}
         />
 
-        <Tabs.Screen
-          name="returnbook"
-          options={{
-            tabBarLabel: ({ focused }) => (
-              <Text style={[styles.tabLabel, focused && styles.tabLabelActive]}>
-                Return Book
-              </Text>
-            ),
-            tabBarIcon: ({ focused }) => (
-              <Ionicons
-                name={'arrow-undo-outline'}
-                color={focused ? "#3498db" : "#A0A0A0"}
-                size={24}
-              />
-            ),
-          }}
-        />
+         <Tabs.Screen
+            name="returnbook"
+            options={{
+              href: null,
+            }}
+          />
       </Tabs>
     </>
   );
