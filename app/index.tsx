@@ -1,3 +1,4 @@
+import { Login } from '@/api/login';
 import { OTPValidation } from '@/api/OtpValidation';
 import { Ionicons } from '@expo/vector-icons';
 import AsyncStorage from "@react-native-async-storage/async-storage";
@@ -103,7 +104,6 @@ export default function Index() {
   };
 
   const handleLogin = async () => {
-    router.replace('/(tabs)/dashboard');
     if (!email.trim() || !password.trim()) {
       Alert.alert("Invalid", "Email and password are required.");
 

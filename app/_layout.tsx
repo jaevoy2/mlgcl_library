@@ -15,6 +15,7 @@ export default function RootLayout() {
         <Stack.Screen name="borrow" options={{ headerShown: false }} />
         <Stack.Screen name="borrowing" options={{ headerShown: false }} />
         <Stack.Screen name="borrowInfo" options={{ headerShown: false }} />
+        <Stack.Screen name="returnbook" options={{ headerShown: false }} />
         <Stack.Screen name="search" options={{ headerShown: false, animation: 'slide_from_right', animationDuration: 100 }} />
         <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
       </Stack>
