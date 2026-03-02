@@ -51,13 +51,13 @@ export const QrResultModal: React.FC<QrResultModalProps> = ({
         returnBookByScan(data)
           .then((result) => {
             if (result && result.success) {
-              setSuccess("Book returned successfully.");
+              setSuccess(result.message || "Book returned successfully.");
               setBookCopy({
                 bookcopies_code: result.copy?.bookcopies_code || data,
                 title: result.copy?.title || "",
-                status: "available",
+                status: result.copy?.status || "available",
               });
-              setFine(result.fine || null);
+              setFine(result.fine || null); // Only set if fine exists
             } else {
               setBookCopy(null);
               setFine(null);
@@ -88,9 +88,6 @@ export const QrResultModal: React.FC<QrResultModalProps> = ({
       <View style={styles.modalOverlay}>
         <View style={styles.modalContent}>
           <Text style={styles.header}>Scan Result</Text>
-          {loading && <Text style={styles.loading}>Loading...</Text>}
-          {error && <Text style={styles.error}>{error}</Text>}
-          {success && <Text style={styles.success}>{success}</Text>}
           {bookCopy && (
             <View style={styles.section}>
               <Text style={styles.label}>Book Copy Code</Text>
@@ -99,7 +96,7 @@ export const QrResultModal: React.FC<QrResultModalProps> = ({
               <Text style={styles.value}>{bookCopy.title}</Text>
               <Text style={styles.label}>Status</Text>
               <Text style={[styles.value, { color: "#4caf50" }]}>
-                Available
+                {bookCopy.status}
               </Text>
             </View>
           )}
@@ -130,19 +127,25 @@ export const QrResultModal: React.FC<QrResultModalProps> = ({
             {loading && (
               <View style={styles.messageRow}>
                 <MaterialIcons name="hourglass-empty" size={22} color="#888" />
-                <Text style={styles.loading}>Loading...</Text>
+                <Text style={[styles.messageText, { color: "#888" }]}>
+                  Loading...
+                </Text>
               </View>
             )}
             {error && (
               <View style={styles.messageRow}>
                 <MaterialIcons name="error-outline" size={22} color="#e53935" />
-                <Text style={styles.error}>{error}</Text>
+                <Text style={[styles.messageText, { color: "#e53935" }]}>
+                  {error}
+                </Text>
               </View>
             )}
             {success && (
               <View style={styles.messageRow}>
                 <MaterialIcons name="check-circle" size={22} color="#43a047" />
-                <Text style={styles.success}>{success}</Text>
+                <Text style={[styles.messageText, { color: "#43a047" }]}>
+                  {success}
+                </Text>
               </View>
             )}
           </View>
@@ -261,11 +264,15 @@ const styles = StyleSheet.create({
     paddingHorizontal: 14,
     marginBottom: 6,
     minWidth: 200,
-    alignSelf: "center",
     shadowColor: "#000",
     shadowOffset: { width: 0, height: 1 },
     shadowOpacity: 0.06,
     shadowRadius: 2,
+  },
+  messageText: {
+    fontSize: 16,
+    marginLeft: 8,
+    fontWeight: "500",
   },
 });
 

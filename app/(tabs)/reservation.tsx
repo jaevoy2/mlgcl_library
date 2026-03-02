@@ -95,7 +95,7 @@ export default function ReservationView() {
 
   const handleSeeDetails = (book: Book) => {
     router.push({
-      pathname: "/BookDetail",
+      pathname: "/ReservationDetail",
       params: { book: JSON.stringify(book) },
     });
   };
@@ -193,9 +193,24 @@ export default function ReservationView() {
       </View>
 
       {/* Search Bar */}
-      <View style={{ paddingHorizontal: 16, marginTop: 10, }}>
-        <View style={{ flexDirection: 'row', alignItems: 'center', borderRadius: 14, paddingBottom: 0, backgroundColor: "#fff", paddingVertical: 3, paddingHorizontal: 18, shadowColor: "#000", shadowOpacity: 0.07,  elevation: 2, shadowRadius: 5, marginBottom: 12, }}>
-          <Ionicons name={'search'} size={18} color={'#b0b8c1'} />
+      <View style={{ paddingHorizontal: 16, marginTop: 10 }}>
+        <View
+          style={{
+            flexDirection: "row",
+            alignItems: "center",
+            borderRadius: 14,
+            paddingBottom: 0,
+            backgroundColor: "#fff",
+            paddingVertical: 3,
+            paddingHorizontal: 18,
+            shadowColor: "#000",
+            shadowOpacity: 0.07,
+            elevation: 2,
+            shadowRadius: 5,
+            marginBottom: 12,
+          }}
+        >
+          <Ionicons name={"search"} size={18} color={"#b0b8c1"} />
           <TextInput
             placeholder="Search reservation"
             value={search}
@@ -216,7 +231,11 @@ export default function ReservationView() {
           paddingBottom: 100,
         }}
         refreshControl={
-          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} colors={['#3498db']} />
+          <RefreshControl
+            refreshing={refreshing}
+            onRefresh={onRefresh}
+            colors={["#3498db"]}
+          />
         }
         keyboardShouldPersistTaps="handled"
       >
