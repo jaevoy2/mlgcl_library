@@ -3,7 +3,8 @@ import { Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { router } from "expo-router";
 import { useEffect, useState } from "react";
-import { ActivityIndicator, Alert, Dimensions, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { ActivityIndicator, Alert, Dimensions, ScrollView, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { PieChart } from 'react-native-gifted-charts';
 
 const { height, width } = Dimensions.get('screen');
 const logo = require('@/assets/images/logo.png')
@@ -12,8 +13,12 @@ const logo = require('@/assets/images/logo.png')
 export default function BooksView() {
     const [loading, setLoading] = useState(false);
     const [bookCount, setBookCount] = useState(0)
+    const [availableBooks, setAvailableBooks] = useState(0);
     const [borrowedBooks, setBorrowedBooks] = useState(0)
     const [bookCopies, setBookCopies] = useState(0);
+    const [reservedBooks, setReservedBooks] = useState(0);
+    const [unavailableCopies, setUnavailableCopies] = useState(0);
+
 
     useEffect(() => {
         handleFetchBooks();
@@ -25,8 +30,12 @@ export default function BooksView() {
 
             if(!response.error) {
                 setBookCount(response.book_count);
+                setAvailableBooks(response.available_count);
                 setBookCopies(response.copy_count);
                 setBorrowedBooks(response.borrowed_count);
+                setReservedBooks(response.reserved_count);
+                setUnavailableCopies(response.unvailable_count);
+
             }
         }catch(error: any) {
             Alert.alert('Error', error.message || 'Failed to load data. Please check your internet connection');
@@ -39,6 +48,16 @@ export default function BooksView() {
         await AsyncStorage.clear();
         router.replace('/')
     } 
+
+    const pieData = [
+        { value: availableBooks, color: '#068a65', text: `${Math.round(availableBooks / bookCopies * 100)}%` },
+        { value: borrowedBooks, color: '#F59E0B', text: `${Math.round(availableBooks / bookCopies * 100)}%` },
+        { value: reservedBooks, color: '#898DFF', text: `${Math.round(reservedBooks / bookCopies * 100)}%` },
+        { value: unavailableCopies, color: '#FF5F5F', text: `${Math.round(unavailableCopies / bookCopies * 100)}%` }
+    ]
+
+
+
 
     return (
         <View style={styles.container}>
@@ -57,7 +76,7 @@ export default function BooksView() {
                     </View>
 
                     {/* Main Content */}
-                    <View style={styles.content}>
+                    <ScrollView style={styles.content}>
                         {/* Books Card */}
                         <View style={styles.card}>
                             <View style={styles.cardContent}>
@@ -95,12 +114,22 @@ export default function BooksView() {
                             </View>
                         </View>
 
+                        <View style={{ alignSelf: 'center' }}>
+                            <PieChart
+                                donut
+                                showText
+                                textColor="#fff"
+                                textSize={14}
+                                data={pieData}
+                            />
+                        </View>
+
                         {/* Footer Text */}
                         <View style={styles.footer}>
                             <Text style={styles.footerTitle}>MLG COLLEGE OF LEARNING, INC.</Text>
                             <Text style={styles.footerSubtitle}>Library Management System v1.0</Text>
                         </View>
-                    </View>
+                    </ScrollView>
 
                     <View style={styles.floatingCon}>
                         <TouchableOpacity 
@@ -154,7 +183,7 @@ const styles = StyleSheet.create({
     },
     content: {
         flex: 1,
-        paddingTop: 20,
+        paddingVertical: 20,
         paddingHorizontal: 20,
     },
     card: {

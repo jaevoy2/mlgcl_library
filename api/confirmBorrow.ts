@@ -21,7 +21,9 @@ export async function ConfirmBorrow(borrowData: BorrowProps) {
             body: JSON.stringify({ 
                 book_copy_id: borrowData.bookCopyId,
                 user_id: borrowData.userId,
-                borrower_type: borrowData.userType
+                borrower_type: borrowData.userType,
+                full_name: borrowData.userName,
+                image_url: borrowData.userImage
             })
         });
 

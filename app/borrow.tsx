@@ -70,7 +70,6 @@ export default function HomeScreen() {
     setIsScanning(false);
     
     if(scannedBook != null) {
-      console.log('test');
       try {
         const qrOrigin = 'https://portal.mlgcl.edu.ph';
         const url =  new URL(data);
@@ -86,7 +85,6 @@ export default function HomeScreen() {
         }
 
         const response = await ValidateUserQr(String(lastpart));
-        console.log(response)
         if(!response.error) {
           updateBorrowedBook('userId', response.data.user.id)
           updateBorrowedBook('userName', response.data.full_name);
