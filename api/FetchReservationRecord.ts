@@ -55,7 +55,7 @@ export async function fetchBookReservationAvailability(
 
   try {
     const controller = new AbortController();
-    const timeout = setTimeout(() => controller.abort(), 90000); // 1min and 30sec
+    const timeout = setTimeout(() => controller.abort(), 60000); // 1min
 
     const base = LIBRARY_API_URL.endsWith("/")
       ? LIBRARY_API_URL
