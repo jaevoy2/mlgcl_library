@@ -1,6 +1,6 @@
 import {
+  fetchBatchBookReservationAvailability,
   fetchBookList,
-  fetchBookReservationAvailability,
 } from "@/api/FetchReservationRecord";
 import { Ionicons } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
@@ -51,19 +51,23 @@ export default function ReservationView() {
       setError(null);
 
       const bookList = await fetchBookList();
+      const bookIds = bookList.map((book) => book.id);
 
-      // Fetch reservation/availability for each book
-      const results = [];
-      for (const book of bookList) {
-        const res = await fetchBookReservationAvailability(book.id);
-        results.push({
+      // Fetch all reservation/availability data in one batch request
+      const batchData = await fetchBatchBookReservationAvailability(bookIds);
+
+      console.log("Batch data:", batchData);
+
+      const results = bookList.map((book) => {
+        const res = batchData[book.id];
+        return {
           id: book.id,
           title: book.title,
           reserved: res?.active_reservations ?? 0,
           available: res?.available_copies ?? 0,
           reservation: res?.reservations ?? [],
-        });
-      }
+        };
+      });
 
       setBooks(results);
     } catch {

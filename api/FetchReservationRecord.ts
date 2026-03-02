@@ -55,7 +55,7 @@ export async function fetchBookReservationAvailability(
 
   try {
     const controller = new AbortController();
-    const timeout = setTimeout(() => controller.abort(), 60000); // 1min
+    const timeout = setTimeout(() => controller.abort(), 10000); // 1min and
 
     const base = LIBRARY_API_URL.endsWith("/")
       ? LIBRARY_API_URL
@@ -78,10 +78,12 @@ export async function fetchBookReservationAvailability(
 
     const data = await response.json();
     if (!response.ok || !data.success) {
+      console.log("Book availability API error:", data);
       return null;
     }
     return data.data || null;
   } catch (error) {
+    console.log("Book availability fetch error:", error);
     return null;
   }
 }
@@ -120,5 +122,49 @@ export async function fetchBookList() {
     return data.books || data.data || data || [];
   } catch (error) {
     return [];
+  }
+}
+
+export async function fetchBatchBookReservationAvailability(
+  bookIds: (number | string)[],
+) {
+  const extras = Constants.expoConfig?.extra ?? {};
+  const LIBRARY_API_URL = extras.LIBRARY_API_URL as string;
+  const LIBRARY_API_KEY = extras.LIBRARY_API_KEY as string;
+  const LIBRARY_ORIGIN = extras.LIBRARY_ORIGIN as string;
+  const AUTH_TOKEN = extras.AUTH_TOKEN as string;
+
+  try {
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 30000);
+
+    const base = LIBRARY_API_URL.endsWith("/")
+      ? LIBRARY_API_URL
+      : LIBRARY_API_URL + "/";
+    const response = await fetch(
+      `${base}reservations/batch-book-availability`,
+      {
+        method: "POST",
+        headers: {
+          Accept: "application/json",
+          "x-api-key": LIBRARY_API_KEY,
+          Origin: LIBRARY_ORIGIN,
+          Authorization: `Bearer ${AUTH_TOKEN}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ ids: bookIds }),
+        signal: controller.signal,
+      },
+    );
+
+    clearTimeout(timeout);
+
+    const data = await response.json();
+    if (!response.ok || !data.success) {
+      return {};
+    }
+    return data.data || {};
+  } catch (error) {
+    return {};
   }
 }
