@@ -1,4 +1,7 @@
-import { fetchReservationRecords } from "@/api/FetchReservationRecord";
+import {
+  fetchBookList,
+  fetchBookReservationAvailability,
+} from "@/api/FetchReservationRecord";
 import { Ionicons } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
@@ -41,36 +44,28 @@ export default function ReservationView() {
   const navigation = useNavigation<NavigationProp>();
   const router = useRouter();
 
-  // Fetch reservation data
+  // Fetch all books and their reservation/availability totals
   const fetchData = async () => {
     try {
       setLoading(true);
       setError(null);
-      const timeout = setTimeout(() => {
-        setError("Request timed out. Please try again.");
-        setLoading(false);
-      }, 10000);
 
-      const data = await fetchReservationRecords();
-      clearTimeout(timeout);
+      const bookList = await fetchBookList();
 
-      if (Array.isArray(data)) {
-        const mappedBooks = data.map((reservation) => {
-          const book = reservation.book_copy?.book || {};
-          const available =
-            typeof book.available === "number" ? book.available : null;
-          return {
-            id: book.id || reservation.id,
-            title: book.title || "Untitled",
-            reserved: 1,
-            available,
-            reservation,
-          };
+      // Fetch reservation/availability for each book
+      const results = [];
+      for (const book of bookList) {
+        const res = await fetchBookReservationAvailability(book.id);
+        results.push({
+          id: book.id,
+          title: book.title,
+          reserved: res?.active_reservations ?? 0,
+          available: res?.available_copies ?? 0,
+          reservation: res?.reservations ?? [],
         });
-        setBooks(mappedBooks);
-      } else {
-        setBooks([]);
       }
+
+      setBooks(results);
     } catch {
       setError("Failed to fetch reservations.");
       setBooks([]);

@@ -21,7 +21,9 @@ export default function BookDetail() {
 
   const reservations = Array.isArray(parsedBook.reservation)
     ? parsedBook.reservation
-    : [parsedBook.reservation];
+    : parsedBook.reservation
+      ? [parsedBook.reservation]
+      : [];
 
   return (
     <>
@@ -77,47 +79,59 @@ export default function BookDetail() {
           </Text>
 
           {/* Reservation Cards */}
-          {reservations.map((res: any, idx: number) => (
-            <View
-              key={idx}
-              style={{
-                backgroundColor: "#3498db",
-                borderRadius: 24,
-                padding: 22,
-                marginBottom: 22,
-                shadowColor: "#000",
-                shadowOpacity: 0.07,
-                shadowRadius: 6,
-                elevation: 2,
-              }}
-            >
-              <Text style={{ color: "#fff", fontWeight: "bold", fontSize: 16 }}>
-                Reserved by:{" "}
-                <Text style={{ fontWeight: "normal" }}>
-                  {res?.user?.name || "N/A"}
+          {reservations.length === 0 ? (
+            <Text style={{ color: "#888", marginBottom: 18 }}>
+              No reservations for this book.
+            </Text>
+          ) : (
+            reservations.map((res: any, idx: number) => (
+              <View
+                key={idx}
+                style={{
+                  backgroundColor: "#3498db",
+                  borderRadius: 24,
+                  padding: 22,
+                  marginBottom: 22,
+                  shadowColor: "#000",
+                  shadowOpacity: 0.07,
+                  shadowRadius: 6,
+                  elevation: 2,
+                }}
+              >
+                <Text
+                  style={{ color: "#fff", fontWeight: "bold", fontSize: 16 }}
+                >
+                  Reserved by:{" "}
+                  <Text style={{ fontWeight: "normal" }}>
+                    {res?.user?.name || "N/A"}
+                  </Text>
                 </Text>
-              </Text>
 
-              <Text style={{ color: "#fff", marginBottom: 6 }}>
-                Email: {res?.user?.email || "N/A"}
-              </Text>
-
-              <Text style={{ color: "#fff", fontWeight: "bold", fontSize: 16 }}>
-                Status:{" "}
-                <Text style={{ fontWeight: "normal" }}>
-                  {res?.status || "Unknown"}
+                <Text style={{ color: "#fff", marginBottom: 6 }}>
+                  Email: {res?.user?.email || "N/A"}
                 </Text>
-              </Text>
 
-              <Text style={{ color: "#fff", fontWeight: "bold", fontSize: 16 }}>
-                Reserved at:
-              </Text>
+                <Text
+                  style={{ color: "#fff", fontWeight: "bold", fontSize: 16 }}
+                >
+                  Status:{" "}
+                  <Text style={{ fontWeight: "normal" }}>
+                    {res?.status || "Unknown"}
+                  </Text>
+                </Text>
 
-              <Text style={{ color: "#fff" }}>
-                {res?.created_at || "Unknown"}
-              </Text>
-            </View>
-          ))}
+                <Text
+                  style={{ color: "#fff", fontWeight: "bold", fontSize: 16 }}
+                >
+                  Reserved at:
+                </Text>
+
+                <Text style={{ color: "#fff" }}>
+                  {res?.created_at || "Unknown"}
+                </Text>
+              </View>
+            ))
+          )}
 
           {/* Footer */}
           <View style={{ alignItems: "center", marginTop: 10 }}>
