@@ -18,7 +18,7 @@ export function CameraOverlay({
 
     Animated.loop(
       Animated.timing(scanAnim, {
-        toValue: frameSize - 4,
+        toValue: frameSize - 4, // match scan line height
         duration: 2200,
         easing: Easing.linear,
         useNativeDriver: true,
@@ -75,12 +75,18 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: "700",
     textAlign: "center",
-    marginTop: 60,
+    marginTop: 100,
+    marginBottom: 24,
     backgroundColor: "rgba(0,0,0,0.6)",
     padding: 15,
     borderRadius: 12,
     marginHorizontal: 20,
     zIndex: 10,
+    letterSpacing: 1,
+    shadowColor: "#000",
+    shadowOpacity: 0.2,
+    shadowRadius: 8,
+    elevation: 4,
   },
 
   overlay: {

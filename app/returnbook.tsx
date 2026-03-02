@@ -1,16 +1,17 @@
 import { BarcodeScanner } from "@/components/barcode-scanner";
 import { Ionicons } from "@expo/vector-icons";
-import { CameraType, useCameraPermissions } from "expo-camera";
+import { useNavigation } from "@react-navigation/native";
+import { CameraType } from "expo-camera";
 import { LinearGradient } from "expo-linear-gradient";
 import { useState } from "react";
 import { Dimensions, StyleSheet, TouchableOpacity } from "react-native";
+
 import { QrResultModal } from "./returnresultModal";
 
 const { width } = Dimensions.get("screen");
 const FRAME_SIZE = width * 0.8;
 
 export default function TabTwoScreen() {
-  const [permission, requestPermission] = useCameraPermissions();
   const [isCameraActive, setIsCameraActive] = useState(true);
   const [cameraType, setCameraType] = useState<CameraType>("back");
   const [scannedData, setScannedData] = useState<string | null>(null);
@@ -21,7 +22,7 @@ export default function TabTwoScreen() {
   const toggleCameraType = () => {
     setCameraType((prev) => (prev === "back" ? "front" : "back"));
   };
-
+  const navigation = useNavigation();
   const handleScanned = (data: string) => {
     setScannedData(data);
     setShowResultModal(true);
@@ -36,6 +37,18 @@ export default function TabTwoScreen() {
     >
       {isCameraActive && (
         <>
+          <TouchableOpacity
+            style={styles.backButton}
+            onPress={() => navigation.goBack()}
+            activeOpacity={0.8}
+          >
+            <LinearGradient
+              colors={["#f4efef88", "#f1e9e955"]}
+              style={styles.backButtonGradient}
+            >
+              <Ionicons name="arrow-back" size={24} color="#fff" />
+            </LinearGradient>
+          </TouchableOpacity>
           <BarcodeScanner
             instruction="Hold your book’s QR or barcode inside the frame to scan"
             frameSize={FRAME_SIZE}
@@ -83,5 +96,19 @@ const styles = StyleSheet.create({
     padding: 14,
     alignItems: "center",
     justifyContent: "center",
+  },
+  backButton: {
+    position: "absolute",
+    top: 50,
+    left: 20,
+    zIndex: 20,
+    borderRadius: 30,
+  },
+
+  backButtonGradient: {
+    padding: 10,
+    borderRadius: 30,
+    justifyContent: "center",
+    alignItems: "center",
   },
 });
