@@ -43,7 +43,7 @@ export default function BooksView() {
 
     const pieData = [
         { value: availableBooks, color: '#068a65', text: `${Math.round(availableBooks / bookCopies * 100)}%` },
-        { value: borrowedBooks, color: '#F59E0B', text: `${Math.round(availableBooks / bookCopies * 100)}%` },
+        { value: borrowedBooks, color: '#F59E0B', text: `${Math.round(borrowedBooks / bookCopies * 100)}%` },
         { value: reservedBooks, color: '#898DFF', text: `${Math.round(reservedBooks / bookCopies * 100)}%` },
         { value: unavailableCopies, color: '#FF5F5F', text: `${Math.round(unavailableCopies / bookCopies * 100)}%` }
     ]
@@ -115,21 +115,54 @@ export default function BooksView() {
                             </View>
                         </View>
 
-                        <View style={{ alignSelf: 'center' }}>
-                            <PieChart
-                                donut
-                                showText
-                                textColor="#fff"
-                                textSize={14}
-                                data={pieData}
-                            />
+                        <View style={{ flexDirection: 'row', justifyContent: 'flex-start', gap: 20 }}>
+                            <View style={{ flexDirection: 'column', alignItems: 'center', gap: 10 }}>
+                                <PieChart
+                                    donut
+                                    showText
+                                    textColor="#fff"
+                                    textSize={16}
+                                    fontWeight="700"
+                                    innerCircleColor={'#fff'}
+                                    data={pieData}
+                                    radius={width * 0.28}
+                                    innerRadius={width * 0.16}
+                                    centerLabelComponent={() => {
+                                        return (
+                                        <View style={{justifyContent: 'center', alignItems: 'center'}}>
+                                            <Text style={{ color: '#3498db', fontSize: 15 }}>Total Copies</Text>
+                                            <Text style={{fontSize: Math.max(16, Math.min(width * 0.06, 28)), fontWeight: '800', color: '#3498db'}}>{bookCopies}</Text>
+                                        </View>
+                                        );
+                                    }}
+                                />
+                                <Text style={{ fontWeight: '800', color: '#fff', fontSize: 16 }}>Book Copies Status</Text>
+                            </View>
+                            <View style={{ alignItems: 'flex-start', gap: 10, marginTop: 20 }}>
+                                <View style={{ flexDirection: 'row', alignItems: 'center', gap: 5 }}>
+                                    <Ionicons name={'ellipse'} color={'#068a65'} size={14} />
+                                    <Text style={{color: '#fff', fontWeight: '600' }}>Availabe</Text>
+                                </View>
+                                <View style={{ flexDirection: 'row', alignItems: 'center', gap: 5 }}>
+                                    <Ionicons name={'ellipse'} color={'#F59E0B'} size={14} />
+                                    <Text style={{color: '#fff', fontWeight: '600' }}>Borrowed</Text>
+                                </View>
+                                <View style={{ flexDirection: 'row', alignItems: 'center', gap: 5 }}>
+                                    <Ionicons name={'ellipse'} color={'#898DFF'} size={14} />
+                                    <Text style={{color: '#fff', fontWeight: '600' }}>Reserved</Text>
+                                </View>
+                                <View style={{ flexDirection: 'row', alignItems: 'center', gap: 5 }}>
+                                    <Ionicons name={'ellipse'} color={'#FF5F5F'} size={14} />
+                                    <Text style={{color: '#fff', fontWeight: '600' }}>Unavailabe</Text>
+                                </View>
+                            </View>
                         </View>
 
                         {/* Footer */}
-                        <View style={styles.footer}>
+                        {/* <View style={styles.footer}>
                             <Text style={styles.footerTitle}>MLG COLLEGE OF LEARNING, INC.</Text>
                             <Text style={styles.footerSubtitle}>Library Management System v1.0</Text>
-                        </View>
+                        </View> */}
                     </ScrollView>
 
                     {/* Floating Buttons */}
