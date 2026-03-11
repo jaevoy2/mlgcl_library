@@ -19,6 +19,7 @@ export async function Login(email: string, password: string, device_token: strin
         });
 
         const response = await res.json();
+        console.log(response);
 
         if(!res.ok) {
             throw new Error(response.message);
