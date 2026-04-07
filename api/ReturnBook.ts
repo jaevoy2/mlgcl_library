@@ -1,81 +1,152 @@
 import Constants from "expo-constants";
 
-// Fetch book copy details by code
-export async function fetchBookCopyDetails(bookcopies_code: string) {
-  const extras = Constants.expoConfig?.extra ?? {};
-  const LIBRARY_API_URL = extras.LIBRARY_API_URL as string;
-  const LIBRARY_API_KEY = extras.LIBRARY_API_KEY as string;
-  const LIBRARY_ORIGIN = extras.LIBRARY_ORIGIN as string;
+const extras = Constants.expoConfig?.extra ?? {};
+const LIBRARY_API_URL: string = extras.LIBRARY_API_URL ?? "";
+const LIBRARY_API_KEY: string = extras.LIBRARY_API_KEY ?? "";
+const LIBRARY_ORIGIN: string = extras.LIBRARY_ORIGIN ?? "";
+const AUTH_TOKEN: string = extras.AUTH_TOKEN ?? "";
+
+const baseUrl = LIBRARY_API_URL.endsWith("/")
+  ? LIBRARY_API_URL
+  : LIBRARY_API_URL + "/";
+
+function buildHeaders(): Record<string, string> {
+  return {
+    "Content-Type": "application/json",
+    Accept: "application/json",
+    "x-api-key": LIBRARY_API_KEY,
+    Origin: LIBRARY_ORIGIN,
+    Authorization: `Bearer ${AUTH_TOKEN}`,
+  };
+}
+
+async function postWithTimeout<T>(
+  endpoint: string,
+  body: Record<string, unknown>,
+  timeoutMs = 15000,
+): Promise<T> {
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), timeoutMs);
 
   try {
-    const response = await fetch(`${LIBRARY_API_URL}books/bookCopies`, {
+    const response = await fetch(`${baseUrl}${endpoint}`, {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Accept: "application/json",
-        "x-api-key": LIBRARY_API_KEY,
-        Origin: LIBRARY_ORIGIN,
-        Authorization: `I5MulGCY8dmFEr6xUB2oKtiLiLzEDf8goYBdTmy9RuPt6K0p70Zrb7txhl3bE6Jz`,
-      },
-      body: JSON.stringify({ bookcopies_code }),
+      headers: buildHeaders(),
+      body: JSON.stringify(body),
+      signal: controller.signal,
     });
 
-    if (!response.ok) throw new Error("Network response was not ok");
     const data = await response.json();
-    return data;
+
+    if (!response.ok) {
+      throw new Error(data.message || `Request failed (${response.status})`);
+    }
+
+    return data as T;
   } catch (error) {
-    console.error("Error fetching book copy details:", error);
+    if (error instanceof Error) {
+      throw error.name === "AbortError"
+        ? new Error("Request timed out")
+        : error;
+    }
+    throw new Error("Unknown error");
+  } finally {
+    clearTimeout(timeout);
+  }
+}
+
+// ─── Types ────────────────────────────────────────────────────────────────────
+
+export type ApiError = { success: false; message: string };
+
+export type BookCopyDetailsResponse = {
+  success: boolean;
+  message?: string;
+  // extend with your actual fields as needed
+  [key: string]: unknown;
+};
+
+export type FineDetails = {
+  amount: number;
+  description: string;
+  days_overdue?: number;
+  waived_days?: number;
+};
+
+export type ReturnBookResponse = {
+  success: boolean;
+  message: string;
+  copy?: {
+    id: number;
+    bookcopies_code: string;
+    title: string;
+    status: string;
+  };
+  fine?: FineDetails | null;
+};
+
+// ─── API calls ────────────────────────────────────────────────────────────────
+
+/**
+ * Fetch book copy details by accession/copy code.
+ */
+export async function fetchBookCopyDetails(
+  bookcopies_code: string,
+): Promise<BookCopyDetailsResponse | ApiError> {
+  try {
+    return await postWithTimeout<BookCopyDetailsResponse>("books/bookCopies", {
+      bookcopies_code,
+    });
+  } catch (error) {
     return {
       success: false,
-      message: error instanceof Error ? error.message : JSON.stringify(error),
+      message: error instanceof Error ? error.message : "Unknown error",
     };
   }
 }
 
-// Return book by scan
-export async function returnBookByScan(uuid: string) {
-  const extras = Constants.expoConfig?.extra ?? {};
-  const LIBRARY_API_URL = extras.LIBRARY_API_URL as string;
-  const LIBRARY_API_KEY = extras.LIBRARY_API_KEY as string;
-  const LIBRARY_ORIGIN = extras.LIBRARY_ORIGIN as string;
-  const AUTH_TOKEN = extras.AUTH_TOKEN as string; // already here, now used
-
+/**
+ * Preview a return — calculates fine without committing any changes.
+ * Hits the dedicated /return/preview-return endpoint.
+ */
+export async function previewBookReturn(
+  uuid: string,
+  opts?: { waiveFine?: boolean; waivedDays?: number },
+): Promise<ReturnBookResponse | ApiError> {
+  const { waiveFine = false, waivedDays = 0 } = opts ?? {};
   try {
-    const controller = new AbortController();
-    const timeout = setTimeout(() => controller.abort(), 3000);
-
-    const base = LIBRARY_API_URL.endsWith("/")
-      ? LIBRARY_API_URL
-      : LIBRARY_API_URL + "/";
-    const response = await fetch(`${base}return/scan-book`, {
-      method: "POST",
-      headers: {
-        Accept: "application/json",
-        "Content-Type": "application/json",
-        "x-api-key": LIBRARY_API_KEY,
-        Origin: LIBRARY_ORIGIN,
-        Authorization: `Bearer ${AUTH_TOKEN}`,
-      },
-      body: JSON.stringify({ qr_uuid: uuid }),
-      signal: controller.signal,
+    return await postWithTimeout<ReturnBookResponse>("return/preview-return", {
+      qr_uuid: uuid,
+      waive_fine: waiveFine,
+      waived_days: waivedDays,
     });
-
-    clearTimeout(timeout);
-
-    const data = await response.json();
-    if (!response.ok) {
-      throw new Error(data.message || "Failed to return book");
-    }
-    return data;
   } catch (error) {
     return {
       success: false,
-      message:
-        error instanceof Error
-          ? error.name === "AbortError"
-            ? "Request timed out"
-            : error.message
-          : "Unknown error",
+      message: error instanceof Error ? error.message : "Unknown error",
+    };
+  }
+}
+
+/**
+ * Commit the book return, recording any applicable fine.
+ * Hits the dedicated /return/scan-book endpoint.
+ */
+export async function returnBookByScan(
+  uuid: string,
+  opts?: { waiveFine?: boolean; waivedDays?: number },
+): Promise<ReturnBookResponse | ApiError> {
+  const { waiveFine = false, waivedDays = 0 } = opts ?? {};
+  try {
+    return await postWithTimeout<ReturnBookResponse>("return/scan-book", {
+      qr_uuid: uuid,
+      waive_fine: waiveFine,
+      waived_days: waivedDays,
+    });
+  } catch (error) {
+    return {
+      success: false,
+      message: error instanceof Error ? error.message : "Unknown error",
     };
   }
 }
