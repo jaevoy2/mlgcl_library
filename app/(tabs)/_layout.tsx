@@ -46,7 +46,7 @@ export default function TabsLayout() {
                 Reservations
               </Text>
             ),
-            tabBarIcon: ({ focused }) => (
+            tabBarIcon: ({ focused }) => (  
               <Ionicons
                 name={'bookmark-outline'}
                 color={focused ? "#3498db" : "#A0A0A0"}

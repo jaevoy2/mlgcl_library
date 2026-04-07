@@ -56,18 +56,18 @@ export default function ReservationView() {
       // Fetch all reservation/availability data in one batch request
       const batchData = await fetchBatchBookReservationAvailability(bookIds);
 
-      console.log("Batch data:", batchData);
-
-      const results = bookList.map((book) => {
-        const res = batchData[book.id];
-        return {
-          id: book.id,
-          title: book.title,
-          reserved: res?.active_reservations ?? 0,
-          available: res?.available_copies ?? 0,
-          reservation: res?.reservations ?? [],
-        };
-      });
+      const results = bookList
+        .map((book) => {
+          const res = batchData[book.id];
+          return {
+            id: book.id,
+            title: book.title,
+            reserved: res?.total_reservations ?? 0,
+            available: res?.available_copies ?? 0,
+            reservation: res?.reservations ?? [],
+          };
+        })
+        .filter((book) => book.reserved > 0);
 
       setBooks(results);
     } catch {
@@ -105,13 +105,17 @@ export default function ReservationView() {
       key={`${book.id}-${idx}`}
       style={{
         backgroundColor: "#fff",
-        borderRadius: 18,
-        padding: width > 600 ? 24 : 18,
-        marginBottom: 18,
-        shadowColor: "#000",
-        shadowOpacity: 0.07,
-        shadowRadius: 6,
-        elevation: 2,
+        borderRadius: 20,
+        padding: 20,
+        marginBottom: 20,
+        borderLeftWidth: 6,
+        borderLeftColor: "#3498db",
+        borderWidth: 1,
+        borderColor: "#e3eaf2",
+        shadowColor: "#3498db",
+        shadowOpacity: 0.08,
+        shadowRadius: 10,
+        elevation: 3,
         width: width > 600 ? 500 : "100%",
         alignSelf: "center",
         minHeight: 110,
@@ -120,11 +124,12 @@ export default function ReservationView() {
     >
       <Text
         style={{
-          fontSize: width > 600 ? 19 : 17,
-          fontWeight: "700",
+          fontSize: width > 600 ? 20 : 18,
+          fontWeight: "800",
           color: "#222b45",
-          marginBottom: 8,
+          marginBottom: 10,
           flexWrap: "wrap",
+          letterSpacing: 0.2,
         }}
         numberOfLines={2}
         ellipsizeMode="tail"
@@ -135,18 +140,18 @@ export default function ReservationView() {
         style={{
           flexDirection: "row",
           justifyContent: "space-between",
-          marginBottom: 10,
+          marginBottom: 12,
         }}
       >
         <View>
           <Text style={{ color: "#6b7280", fontSize: 13 }}>Reserved</Text>
-          <Text style={{ color: "#ff9800", fontWeight: "bold", fontSize: 18 }}>
+          <Text style={{ color: "#ff9800", fontWeight: "bold", fontSize: 20 }}>
             {book.reserved}
           </Text>
         </View>
         <View style={{ alignItems: "flex-end" }}>
           <Text style={{ color: "#6b7280", fontSize: 13 }}>Available</Text>
-          <Text style={{ color: "#22b573", fontWeight: "bold", fontSize: 18 }}>
+          <Text style={{ color: "#22b573", fontWeight: "bold", fontSize: 20 }}>
             {book.available !== null ? book.available : "Unknown"}
           </Text>
         </View>
@@ -154,14 +159,26 @@ export default function ReservationView() {
       <TouchableOpacity
         style={{
           backgroundColor: "#3498db",
-          borderRadius: 10,
-          paddingVertical: 12,
+          borderRadius: 12,
+          paddingVertical: 13,
           alignItems: "center",
+          marginTop: 2,
+          shadowColor: "#3498db",
+          shadowOpacity: 0.1,
+          shadowRadius: 6,
+          elevation: 2,
         }}
         onPress={() => handleSeeDetails(book)}
         activeOpacity={0.85}
       >
-        <Text style={{ color: "#fff", fontWeight: "600", fontSize: 17 }}>
+        <Text
+          style={{
+            color: "#fff",
+            fontWeight: "700",
+            fontSize: 17,
+            letterSpacing: 0.5,
+          }}
+        >
           See Details
         </Text>
       </TouchableOpacity>
@@ -169,54 +186,65 @@ export default function ReservationView() {
   );
 
   return (
-    <View style={{ flex: 1, backgroundColor: "#f6f8fa" }}>
+    <View style={{ flex: 1, backgroundColor: "#f4faff" }}>
       {/* Header */}
       <View
         style={{
           width: "100%",
-          paddingTop: 40,
-          paddingBottom: 20,
-          paddingHorizontal: 20,
+          paddingTop: 48,
+          paddingBottom: 24,
+          paddingHorizontal: 24,
           backgroundColor: "#3498db",
           flexDirection: "row",
           alignItems: "center",
-          shadowColor: "#000",
-          shadowOpacity: 0.08,
-          shadowRadius: 6,
-          elevation: 4,
+          shadowColor: "#3498db",
+          shadowOpacity: 0.1,
+          shadowRadius: 8,
+          elevation: 8,
+          borderBottomLeftRadius: 24,
+          borderBottomRightRadius: 24,
         }}
       >
-        <Text style={{ color: "#fff", fontSize: 18, fontWeight: "700" }}>
+        <Text
+          style={{
+            color: "#fff",
+            fontSize: 22,
+            fontWeight: "800",
+            letterSpacing: 1,
+          }}
+        >
           Reservations
         </Text>
       </View>
 
       {/* Search Bar */}
-      <View style={{ paddingHorizontal: 16, marginTop: 10 }}>
+      <View style={{ paddingHorizontal: 20, marginTop: 18 }}>
         <View
           style={{
             flexDirection: "row",
             alignItems: "center",
-            borderRadius: 14,
-            paddingBottom: 0,
+            borderRadius: 16,
             backgroundColor: "#fff",
-            paddingVertical: 3,
+            paddingVertical: 8,
             paddingHorizontal: 18,
-            shadowColor: "#000",
+            shadowColor: "#3498db",
             shadowOpacity: 0.07,
             elevation: 2,
-            shadowRadius: 5,
-            marginBottom: 12,
+            shadowRadius: 8,
+            marginBottom: 16,
           }}
         >
-          <Ionicons name={"search"} size={18} color={"#b0b8c1"} />
+          <Ionicons name={"search"} size={20} color={"#3498db"} />
           <TextInput
             placeholder="Search reservation"
             value={search}
             onChangeText={setSearch}
             placeholderTextColor="#b0b8c1"
             style={{
-              fontSize: 16,
+              fontSize: 17,
+              marginLeft: 10,
+              flex: 1,
+              color: "#222b45",
             }}
           />
         </View>
