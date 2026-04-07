@@ -9,6 +9,7 @@ import {
   TextInput,
   View,
   Switch,
+  Alert,
 } from "react-native";
 
 import { previewBookReturn, returnBookByScan } from "../api/ReturnBook";
@@ -46,6 +47,7 @@ export const QrResultModal: React.FC<QrResultModalProps> = ({
   const [success, setSuccess] = useState<string | null>(null);
   const [waiveFine, setWaiveFine] = useState(false);
   const [waivedDays, setWaivedDays] = useState("0");
+  const [maxWaivableDays, setMaxWaivableDays] = useState(0);
 
   // Load preview when modal opens — no DB changes occur here
   useEffect(() => {
@@ -57,6 +59,7 @@ export const QrResultModal: React.FC<QrResultModalProps> = ({
     setSuccess(null);
     setWaiveFine(false);
     setWaivedDays("0");
+    setMaxWaivableDays(0);
 
     const loadPreview = async () => {
       setLoading(true);
@@ -70,6 +73,11 @@ export const QrResultModal: React.FC<QrResultModalProps> = ({
             status: preview.copy?.status || "borrowed",
           });
           setFine(preview.fine ?? null);
+          
+          // Set max waivable days from the preview response
+          if (preview.fine?.days_overdue) {
+            setMaxWaivableDays(preview.fine.days_overdue);
+          }
         } else {
           setError(preview?.message || "Failed to load book details.");
         }
@@ -83,14 +91,68 @@ export const QrResultModal: React.FC<QrResultModalProps> = ({
     loadPreview();
   }, [visible, data]);
 
+  // Handle waived days input with validation
+  const handleWaivedDaysChange = (value: string) => {
+    // Allow empty string
+    if (value === "") {
+      setWaivedDays("0");
+      return;
+    }
+    
+    // Parse the input
+    let numValue = parseInt(value, 10);
+    
+    // Check if it's a valid number
+    if (isNaN(numValue)) {
+      return;
+    }
+    
+    // Ensure it's not negative
+    numValue = Math.max(0, numValue);
+    
+    // Limit to max waivable days
+    if (numValue > maxWaivableDays) {
+      Alert.alert(
+        "Invalid Amount",
+        `You can only waive up to ${maxWaivableDays} day(s).`,
+        [{ text: "OK" }]
+      );
+      setWaivedDays(maxWaivableDays.toString());
+      return;
+    }
+    
+    setWaivedDays(numValue.toString());
+  };
+
+  // Handle blur event to ensure valid value
+  const handleWaivedDaysBlur = () => {
+    let numValue = parseInt(waivedDays, 10);
+    
+    if (isNaN(numValue) || numValue < 0) {
+      setWaivedDays("0");
+    } else if (numValue > maxWaivableDays) {
+      setWaivedDays(maxWaivableDays.toString());
+    }
+  };
+
   // Called only when librarian taps "Confirm Return"
   const handleReturn = async () => {
     if (!data || loading || success) return;
 
+    // Validate waived days before submitting
+    const days = parseInt(waivedDays, 10) || 0;
+    
+    if (!waiveFine && days > maxWaivableDays) {
+      Alert.alert(
+        "Invalid Amount",
+        `You can only waive up to ${maxWaivableDays} day(s).`,
+        [{ text: "OK" }]
+      );
+      return;
+    }
+
     setLoading(true);
     setError(null);
-
-    const days = Math.max(0, parseInt(waivedDays, 10) || 0);
 
     try {
       const result = await returnBookByScan(data, { // ← commits the return
@@ -209,21 +271,38 @@ export const QrResultModal: React.FC<QrResultModalProps> = ({
                 <Text style={styles.waiverLabel}>Waive all late fee</Text>
                 <Switch
                   value={waiveFine}
-                  onValueChange={setWaiveFine}
+                  onValueChange={(value) => {
+                    setWaiveFine(value);
+                    if (value) {
+                      // When waiving all, set waived days to max
+                      setWaivedDays(maxWaivableDays.toString());
+                    } else {
+                      setWaivedDays("0");
+                    }
+                  }}
                   disabled={loading}
                 />
               </View>
               {!waiveFine && (
                 <View style={styles.waiverRow}>
-                  <Text style={styles.waiverLabel}>Waive days</Text>
+                  <Text style={styles.waiverLabel}>
+                    Waive days (max: {maxWaivableDays})
+                  </Text>
                   <TextInput
                     style={styles.waiveInput}
                     value={waivedDays}
-                    onChangeText={setWaivedDays}
+                    onChangeText={handleWaivedDaysChange}
+                    onBlur={handleWaivedDaysBlur}
                     keyboardType="number-pad"
-                    editable={!loading}
+                    editable={!loading && maxWaivableDays > 0}
+                    placeholder="0"
                   />
                 </View>
+              )}
+              {!waiveFine && maxWaivableDays === 0 && (
+                <Text style={styles.helperText}>
+                  No days available to waive (book is not overdue)
+                </Text>
               )}
             </View>
           )}
@@ -364,6 +443,12 @@ const styles = StyleSheet.create({
     backgroundColor: "#fff",
     textAlign: "center",
     fontSize: 15,
+  },
+  helperText: {
+    fontSize: 12,
+    color: "#888",
+    marginTop: 8,
+    textAlign: "center",
   },
   confirmButton: {
     marginTop: 4,
