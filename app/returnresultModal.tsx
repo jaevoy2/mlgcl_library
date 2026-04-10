@@ -1,15 +1,15 @@
 import { MaterialIcons } from "@expo/vector-icons";
 import React, { useEffect, useState } from "react";
 import {
+  Alert,
   Dimensions,
   Modal,
   Pressable,
   StyleSheet,
+  Switch,
   Text,
   TextInput,
   View,
-  Switch,
-  Alert,
 } from "react-native";
 
 import { previewBookReturn, returnBookByScan } from "../api/ReturnBook";
@@ -73,7 +73,7 @@ export const QrResultModal: React.FC<QrResultModalProps> = ({
             status: preview.copy?.status || "borrowed",
           });
           setFine(preview.fine ?? null);
-          
+
           // Set max waivable days from the preview response
           if (preview.fine?.days_overdue) {
             setMaxWaivableDays(preview.fine.days_overdue);
@@ -98,36 +98,36 @@ export const QrResultModal: React.FC<QrResultModalProps> = ({
       setWaivedDays("0");
       return;
     }
-    
+
     // Parse the input
     let numValue = parseInt(value, 10);
-    
+
     // Check if it's a valid number
     if (isNaN(numValue)) {
       return;
     }
-    
+
     // Ensure it's not negative
     numValue = Math.max(0, numValue);
-    
+
     // Limit to max waivable days
     if (numValue > maxWaivableDays) {
       Alert.alert(
         "Invalid Amount",
         `You can only waive up to ${maxWaivableDays} day(s).`,
-        [{ text: "OK" }]
+        [{ text: "OK" }],
       );
       setWaivedDays(maxWaivableDays.toString());
       return;
     }
-    
+
     setWaivedDays(numValue.toString());
   };
 
   // Handle blur event to ensure valid value
   const handleWaivedDaysBlur = () => {
     let numValue = parseInt(waivedDays, 10);
-    
+
     if (isNaN(numValue) || numValue < 0) {
       setWaivedDays("0");
     } else if (numValue > maxWaivableDays) {
@@ -141,12 +141,12 @@ export const QrResultModal: React.FC<QrResultModalProps> = ({
 
     // Validate waived days before submitting
     const days = parseInt(waivedDays, 10) || 0;
-    
+
     if (!waiveFine && days > maxWaivableDays) {
       Alert.alert(
         "Invalid Amount",
         `You can only waive up to ${maxWaivableDays} day(s).`,
-        [{ text: "OK" }]
+        [{ text: "OK" }],
       );
       return;
     }
@@ -155,7 +155,8 @@ export const QrResultModal: React.FC<QrResultModalProps> = ({
     setError(null);
 
     try {
-      const result = await returnBookByScan(data, { // ← commits the return
+      const result = await returnBookByScan(data, {
+        // ← commits the return
         waiveFine,
         waivedDays: days,
       });

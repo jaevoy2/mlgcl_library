@@ -1,5 +1,3 @@
-import { Login } from "@/api/login";
-import { OTPValidation } from "@/api/OtpValidation";
 import { Ionicons } from "@expo/vector-icons";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { LinearGradient } from "expo-linear-gradient";
@@ -22,6 +20,8 @@ import {
   View,
 } from "react-native";
 import { OtpInput } from "react-native-otp-entry";
+import { OTPValidation } from "../api/OtpValidation";
+import { Login } from "../api/login";
 
 const logo = require("../assets/images/logo.png");
 const { height, width } = Dimensions.get("screen");
