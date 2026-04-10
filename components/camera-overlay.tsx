@@ -1,6 +1,6 @@
-import { ThemedText } from "@/components/themed-text";
 import { useEffect, useRef } from "react";
 import { Animated, Easing, StyleSheet, View } from "react-native";
+import { ThemedText } from "./themed-text";
 
 export function CameraOverlay({
   instruction,

@@ -1,7 +1,3 @@
-import {
-  fetchBatchBookReservationAvailability,
-  fetchBookList,
-} from "@/api/FetchReservationRecord";
 import { Ionicons } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
@@ -17,6 +13,10 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
+import {
+  fetchBatchBookReservationAvailability,
+  fetchBookList,
+} from "../../api/FetchReservationRecord";
 
 type Book = {
   id: string | number;

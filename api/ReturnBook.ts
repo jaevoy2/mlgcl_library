@@ -105,10 +105,6 @@ export async function fetchBookCopyDetails(
   }
 }
 
-/**
- * Preview a return — calculates fine without committing any changes.
- * Hits the dedicated /return/preview-return endpoint.
- */
 export async function previewBookReturn(
   uuid: string,
   opts?: { waiveFine?: boolean; waivedDays?: number },
@@ -128,10 +124,6 @@ export async function previewBookReturn(
   }
 }
 
-/**
- * Commit the book return, recording any applicable fine.
- * Hits the dedicated /return/scan-book endpoint.
- */
 export async function returnBookByScan(
   uuid: string,
   opts?: { waiveFine?: boolean; waivedDays?: number },

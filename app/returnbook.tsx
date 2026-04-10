@@ -1,10 +1,10 @@
-import { BarcodeScanner } from "@/components/barcode-scanner";
 import { Ionicons } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
 import { CameraType } from "expo-camera";
 import { LinearGradient } from "expo-linear-gradient";
 import { useState } from "react";
 import { Dimensions, StyleSheet, TouchableOpacity } from "react-native";
+import { BarcodeScanner } from "../components/barcode-scanner";
 
 import { QrResultModal } from "./returnresultModal";
 
