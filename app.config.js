@@ -62,6 +62,7 @@ export default {
       LIBRARY_API_KEY: process.env.LIBRARY_API_KEY,
       LIBRARY_API_URL: process.env.LIBRARY_API_URL,
       LIBRARY_ORIGIN: process.env.LIBRARY_ORIGIN,
+      LIBRARY_AUTH_TOKEN: process.env.LIBRARY_AUTH_TOKEN,
       router: {},
       eas: {
         projectId: "c4bcc86b-971d-4a29-bdfd-ca6da42cc944",

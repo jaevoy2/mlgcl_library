@@ -46,11 +46,12 @@ export default function Index() {
 
   useEffect(() => {
     const checkToken = async function getToken() {
-      const token = await AsyncStorage.getItem("device_token");
+      const deviceToken = await AsyncStorage.getItem("device_token");
+      const accessToken = await AsyncStorage.getItem("access_token");
 
       setTimeout(() => {
-        if (token) {
-          router.push("/dashboard");
+        if (deviceToken && accessToken) {
+          router.push("/(tabs)/dashboard");
         }
         setScreenLoading(false);
       }, 600);
