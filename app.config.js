@@ -1,9 +1,9 @@
 export default {
   expo: {
-    name: "library_v2",
+    name: "Mlgcl Library",
     slug: "library_v2",
     version: "1.0.0",
-    orientation: "portrait",
+    orientation: "default",
     icon: "./assets/images/icon.png",
     scheme: "com.mlgcl.library",
     userInterfaceStyle: "automatic",
@@ -18,7 +18,7 @@ export default {
     android: {
       adaptiveIcon: {
         backgroundColor: "#E6F4FE",
-        foregroundImage: "./assets/images/android-icon-foreground.png",
+        foregroundImage: "./assets/images/icon.png",
         backgroundImage: "./assets/images/android-icon-background.png",
         monochromeImage: "./assets/images/android-icon-monochrome.png",
       },

@@ -7,7 +7,6 @@ import {
   ActivityIndicator,
   Alert,
   Animated,
-  Dimensions,
   Image,
   Keyboard,
   KeyboardAvoidingView,
@@ -18,15 +17,16 @@ import {
   TextInput,
   TouchableOpacity,
   View,
+  useWindowDimensions,
 } from "react-native";
 import { OtpInput } from "react-native-otp-entry";
 import { OTPValidation } from "../api/OtpValidation";
 import { Login } from "../api/login";
 
 const logo = require("../assets/images/logo.png");
-const { height, width } = Dimensions.get("screen");
 
 export default function Index() {
+  const { height, width } = useWindowDimensions(); // ✅ dynamic dimensions
   const [screenLoading, setScreenLoading] = useState(true);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -40,14 +40,13 @@ export default function Index() {
   const [isActive, setIsActive] = useState(false);
   const [timeLeft, setTimeLeft] = useState(120);
   const [overlay, setOverlay] = useState(false);
-  const translateY = useRef(new Animated.Value(height)).current;
+  const translateY = useRef(new Animated.Value(1000)).current;
   const fadeInAnim = useRef(new Animated.Value(0)).current;
   const router = useRouter();
 
   useEffect(() => {
     const checkToken = async function getToken() {
       const token = await AsyncStorage.getItem("device_token");
-
       setTimeout(() => {
         if (token) {
           router.push("/dashboard");
@@ -55,23 +54,20 @@ export default function Index() {
         setScreenLoading(false);
       }, 600);
     };
-
     checkToken();
   }, []);
 
   useEffect(() => {
     let timer: ReturnType<typeof setInterval>;
-
     if (isActive) {
       if (timeLeft > 0) {
         timer = setInterval(() => {
           setTimeLeft((prev) => prev - 1);
         }, 1000);
-      } else if (timeLeft == 0) {
+      } else if (timeLeft === 0) {
         setIsActive(false);
       }
     }
-
     return () => clearInterval(timer);
   }, [isActive, timeLeft]);
 
@@ -82,11 +78,11 @@ export default function Index() {
 
   const toggleSheet = () => {
     setOverlay(true);
-
     fadeIn();
     setIsActive(true);
     Animated.timing(translateY, {
       toValue: 0,
+      duration: 300,
       useNativeDriver: true,
     }).start();
   };
@@ -102,17 +98,17 @@ export default function Index() {
   const closeSheet = () => {
     fadeClose();
     setOverlay(false);
-
     Animated.timing(translateY, {
-      toValue: height,
+      toValue: 1000,
+      duration: 300,
       useNativeDriver: true,
     }).start();
   };
 
   const fadeClose = () => {
     Animated.timing(fadeInAnim, {
-      toValue: 1,
-      duration: 500,
+      toValue: 0,
+      duration: 300,
       useNativeDriver: true,
     }).start();
   };
@@ -120,23 +116,19 @@ export default function Index() {
   const handleLogin = async () => {
     if (!email.trim() || !password.trim()) {
       Alert.alert("Invalid", "Email and password are required.");
-
       return;
     }
-
     setLoginSpinner(true);
 
     const chars =
       "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
     let randString = "";
-
     for (let i = 0; i < 5; i++) {
       randString += chars.charAt(Math.floor(Math.random() * chars.length));
     }
 
     try {
       const response = await Login(email.trim(), password.trim(), randString);
-
       if (!response.error) {
         toggleSheet();
         setSessionId(response.session_id);
@@ -156,15 +148,12 @@ export default function Index() {
       Alert.alert("Invalid", "OTP code is required.");
       return;
     }
-
     setOtpSpinner(true);
     try {
       const response = await OTPValidation(Number(otpCode), sessionId);
-
       if (!response.error) {
         await AsyncStorage.setItem("device_token", response.device_token);
         await AsyncStorage.setItem("access_token", response.access_token);
-
         router.replace("/(tabs)/dashboard");
       }
     } catch (error: any) {
@@ -181,12 +170,13 @@ export default function Index() {
 
   return (
     <View style={{ flex: 1 }}>
-      {screenLoading == true ? (
-        <View style={{ justifyContent: "center", height }}>
+      {screenLoading ? (
+        <View style={{ justifyContent: "center", flex: 1 }}>
           <ActivityIndicator color={"#3498db"} size={"large"} />
         </View>
       ) : (
         <>
+          {/* ✅ Gradient now uses flex:1 + absolute fill instead of fixed height */}
           <LinearGradient
             colors={[
               "#4FB3E3",
@@ -198,13 +188,17 @@ export default function Index() {
             ]}
             start={{ x: 0.5, y: 0 }}
             end={{ x: 0.5, y: 1 }}
-            style={{ height, position: "absolute", width, top: 0, zIndex: 1 }}
+            style={StyleSheet.absoluteFillObject} // ✅ covers entire screen always
           />
+
           <KeyboardAvoidingView
             style={{ flex: 1, zIndex: 10 }}
             behavior={Platform.OS === "ios" ? "padding" : "height"}
           >
-            <ScrollView style={{ flex: 1 }}>
+            <ScrollView
+              style={{ flex: 1 }}
+              contentContainerStyle={{ paddingBottom: 80 }}
+            >
               <View
                 style={{
                   paddingTop: 120,
@@ -213,13 +207,11 @@ export default function Index() {
                 }}
               >
                 <View style={styles.logoContainer}>
-                  <View>
-                    <Image
-                      source={logo}
-                      style={{ height: 60, width: 60 }}
-                      resizeMode="contain"
-                    />
-                  </View>
+                  <Image
+                    source={logo}
+                    style={{ height: 60, width: 60 }}
+                    resizeMode="contain"
+                  />
                 </View>
 
                 <View
@@ -264,6 +256,7 @@ export default function Index() {
                       ]}
                     />
                   </View>
+
                   <View style={{ width: "100%" }}>
                     <Text style={styles.label}>Password</Text>
                     <View
@@ -287,35 +280,26 @@ export default function Index() {
                         onPress={() => setIsPasswordVisible(!isPasswordVisible)}
                         style={{ paddingHorizontal: 15 }}
                       >
-                        {isPasswordVisible == true ? (
-                          <Ionicons
-                            name="lock-open"
-                            color={"#7DB8D1"}
-                            size={22}
-                          />
-                        ) : (
-                          <Ionicons
-                            name="lock-closed"
-                            color={"#7DB8D1"}
-                            size={22}
-                          />
-                        )}
+                        <Ionicons
+                          name={isPasswordVisible ? "lock-open" : "lock-closed"}
+                          color={"#7DB8D1"}
+                          size={22}
+                        />
                       </TouchableOpacity>
                     </View>
                   </View>
 
                   <TouchableOpacity
                     disabled={loginSpinner}
-                    onPress={() => handleLogin()}
+                    onPress={handleLogin}
                     style={[
                       styles.button,
                       {
-                        backgroundColor:
-                          loginSpinner == true ? "#F5C557" : "#F5B840",
+                        backgroundColor: loginSpinner ? "#F5C557" : "#F5B840",
                       },
                     ]}
                   >
-                    {loginSpinner == true ? (
+                    {loginSpinner ? (
                       <ActivityIndicator
                         size={"small"}
                         color={"#fff"}
@@ -327,6 +311,7 @@ export default function Index() {
                   </TouchableOpacity>
                 </View>
 
+                {/* ✅ OTP Sheet - uses width from useWindowDimensions */}
                 <Animated.View
                   style={{
                     flexDirection: "column",
@@ -361,7 +346,7 @@ export default function Index() {
                         autoFocus={false}
                         onTextChange={(text) => {
                           setOtpCode(text);
-                          if (text.length == 6) {
+                          if (text.length === 6) {
                             Keyboard.dismiss();
                           }
                         }}
@@ -378,26 +363,25 @@ export default function Index() {
                         Didn't receive a code?{" "}
                       </Text>
                       <TouchableOpacity
-                        onPress={() => handleResendOtp()}
+                        onPress={handleResendOtp}
                         disabled={isActive}
                       >
                         <Text
                           style={{
                             fontSize: 12,
                             fontWeight: "700",
-                            color: isActive == true ? "#78bdebff" : "#3498db",
+                            color: isActive ? "#78bdebff" : "#3498db",
                           }}
                         >
                           Resend code
                         </Text>
                       </TouchableOpacity>
                       {isActive && (
-                        <>
-                          <Text>{` (${timeLeft})`}</Text>
-                        </>
+                        <Text style={{ fontSize: 12 }}>{` (${timeLeft})`}</Text>
                       )}
                     </View>
                   </View>
+
                   <View
                     style={{
                       position: "relative",
@@ -407,17 +391,16 @@ export default function Index() {
                     }}
                   >
                     <TouchableOpacity
-                      onPress={() => handleOTPValidation()}
+                      onPress={handleOTPValidation}
                       disabled={otpSpinner}
                       style={{
-                        backgroundColor:
-                          otpSpinner == true ? "#5faee2ff" : "#3498db",
+                        backgroundColor: otpSpinner ? "#5faee2ff" : "#3498db",
                         width: "100%",
                         borderRadius: 10,
                         paddingVertical: 14,
                       }}
                     >
-                      {otpSpinner == true ? (
+                      {otpSpinner ? (
                         <ActivityIndicator
                           size={"small"}
                           color={"#fff"}
@@ -436,7 +419,7 @@ export default function Index() {
                         </Text>
                       )}
                     </TouchableOpacity>
-                    <TouchableOpacity onPress={() => closeSheet()}>
+                    <TouchableOpacity onPress={closeSheet}>
                       <Text
                         style={{
                           fontWeight: "bold",
@@ -453,6 +436,7 @@ export default function Index() {
               </View>
             </ScrollView>
           </KeyboardAvoidingView>
+
           <View style={styles.footer}>
             <Text style={styles.footerText}>@CreativeDevLabs</Text>
           </View>
@@ -463,13 +447,6 @@ export default function Index() {
 }
 
 const styles = StyleSheet.create({
-  container: {
-    padding: 20,
-    height: height,
-    width: width,
-    paddingTop: 100,
-    gap: 50,
-  },
   logoContainer: {
     alignItems: "center",
     justifyContent: "center",
@@ -557,8 +534,8 @@ const styles = StyleSheet.create({
   },
   footer: {
     position: "absolute",
-    left: "50%",
-    transform: [{ translateX: "-50%" }],
+    left: 0,
+    right: 0,
     bottom: 40,
     alignItems: "center",
     zIndex: 10,
